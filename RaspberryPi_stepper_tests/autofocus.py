@@ -11,17 +11,18 @@ picam2.configure(picam2.create_still_configuration())
 picam2.start()
 
 # Initialize stepper motor
-GPIO_pins = (14, 15, 18) # Microstep Resolution MS1-MS3 -> GPIO Pin
-direction = 27       # Direction -> GPIO Pin
-step = 17      # Step -> GPIO Pin
+GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
+direction = 27  # Direction -> GPIO Pin
+step = 17  # Step -> GPIO Pin
 STEP_SIZE = 5  # Adjust step size as needed
 MAX_STEPS = 100  # Maximum steps to prevent endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
 
 def motor_move(steps):
     motor.motor_go(False, "Full", steps, .01, False, .05)
+    print(f"Motor moved by {steps} steps")
 
-def capture_image():
+def capture_image():    
     """Capture an image from the camera."""
     return picam2.capture_array()
 
@@ -39,9 +40,11 @@ def hill_climb_focus():
     step_size = STEP_SIZE
     direction = 1  # 1 for forward, -1 for backward
 
+    print("Starting autofocus...")
+
     for _ in range(MAX_STEPS):
         # Move stepper motor
-        motor_move(step_size * direction)  # Adjust based on your stepper library
+        motor_move(step_size * direction)  # Move the motor by step_size * direction
         time.sleep(0.2)  # Wait for vibrations to settle
 
         # Capture and evaluate sharpness
