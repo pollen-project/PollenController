@@ -28,8 +28,8 @@ PAGE = """\
 GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
 direction = 27  # Direction -> GPIO Pin
 step = 17  # Step -> GPIO Pin
-STEP_SIZE = 150  # Adjust step size for the motor
-MAX_STEPS = 1500  # Max number of steps to prevent an endless loop
+STEP_SIZE = 50  # Adjust step size for the motor
+MAX_STEPS = 3000  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
 
 
@@ -179,7 +179,12 @@ def hill_climb_focus(picam2):
 
 
 def motor_move(steps):
-    motor.motor_go(False, "Full", steps, .01, False, .05)
+    if steps > 0:
+        motor.motor_go(True, "Full", steps, 0.005, False, 0.01)  # Move forward
+        print(f"Moved {steps} steps forward")
+    elif steps < 0:
+        motor.motor_go(False, "Full", abs(steps), 0.005, False, 0.01)  # Move backward
+        print(f"Moved {abs(steps)} steps backward")
     print(f"Motor moved by {steps} steps")
 
 
