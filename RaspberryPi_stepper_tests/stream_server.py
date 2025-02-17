@@ -28,8 +28,8 @@ PAGE = """\
 GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
 direction = 27  # Direction -> GPIO Pin
 step = 17  # Step -> GPIO Pin
-STEP_SIZE = 50  # Adjust step size for the motor
-MAX_STEPS = 3000  # Max number of steps to prevent an endless loop
+STEP_SIZE = 25  # Adjust step size for the motor
+MAX_STEPS = 2000  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
 
 
@@ -40,21 +40,22 @@ class StreamingOutput(io.BufferedIOBase):
 
     def write(self, buf):
         with self.condition:
-            # Convert JPEG buffer to NumPy array
-            image_array = np.frombuffer(buf, dtype=np.uint8)
+            # # Convert JPEG buffer to NumPy array
+            # image_array = np.frombuffer(buf, dtype=np.uint8)
 
-            # Decode image from JPEG
-            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            # # Decode image from JPEG
+            # image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-            # Convert to grayscale
-            gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # # Convert to grayscale
+            # gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-            # Re-encode as JPEG
-            _, jpeg_buffer = cv2.imencode('.jpg', gray_image)
+            # # Re-encode as JPEG
+            # _, jpeg_buffer = cv2.imencode('.jpg', gray_image)
 
-            # Save the processed frame
-            self.frame = jpeg_buffer.tobytes()
+            # # Save the processed frame
+            # self.frame = jpeg_buffer.tobytes()
 
+            self.frame = buf
             self.condition.notify_all()
 
 
@@ -129,14 +130,37 @@ def start_streaming_server(picam2):
 #     adjust_focus(sharpness, picam2)
 
 
-def calculate_sharpness(image):
+def calculate_sharpness():
     """Calculate sharpness using the Laplacian Variance method."""
+    image = picam2.capture_array()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     laplacian = cv2.Laplacian(gray, cv2.CV_64F)
     return np.var(laplacian)
 
 
-def hill_climb_focus(picam2):
+def startup():
+    sharpness_list = []
+    motor_position = MAX_STEPS // 2 * -1
+    motor_move(motor_position)
+
+    for i in range(MAX_STEPS // STEP_SIZE):
+        motor_move(STEP_SIZE)
+        motor_position += STEP_SIZE
+        sharpness = calculate_sharpness()
+        sharpness_list.append((motor_position, sharpness))
+
+    for (motor_position, sharpness) in sharpness_list:
+        print(f"Position: {motor_position}, Sharpness: {sharpness}")
+
+    best_position = max(sharpness_list, key=lambda item: item[1])[0]
+    print(f"Best position: {best_position}")
+    if best_position < 0:
+        motor_move((motor_position + abs(best_position)) * -1)
+    else:
+        motor_move((motor_position - best_position) * -1)
+
+
+def hill_climb_focus():
     """Perform hill climbing to find the optimal focus position."""
     best_position = 0
     best_sharpness = 0
@@ -145,23 +169,26 @@ def hill_climb_focus(picam2):
     direction = 1  # 1 for forward, -1 for backward
 
     print("Starting autofocus...")
+    motor_move(step_size * -1)
+    best_sharpness = calculate_sharpness()
+    print(f"Initial sharpness: {best_sharpness}")
 
     for _ in range(MAX_STEPS):
         # Move the motor by step_size * direction
         motor_move(step_size * direction)  
         current_position += step_size * direction  # Update position after moving
 
-        time.sleep(0.8)  # Wait for vibrations to settle
+        time.sleep(0.2)  # Wait for vibrations to settle
 
         # Capture and evaluate sharpness
-        image = picam2.capture_array()
-        sharpness = calculate_sharpness(image)
+        sharpness = calculate_sharpness()
         print(f"Position: {current_position}, Sharpness: {sharpness}")
 
-        if sharpness > best_sharpness:
+        sharpness_diff = sharpness - best_sharpness
+        if sharpness_diff > 0.5:
             best_sharpness = sharpness
             best_position = current_position  # Store best position
-        else:
+        elif sharpness_diff < 0.5:
             # Reverse direction and reduce step size
             direction *= -1
             step_size = max(1, step_size // 2)
@@ -180,20 +207,20 @@ def hill_climb_focus(picam2):
 
 def motor_move(steps):
     if steps > 0:
-        motor.motor_go(True, "Full", steps, 0.005, False, 0.01)  # Move forward
-        print(f"Moved {steps} steps forward")
+        motor.motor_go(True, "1/4", steps, 0.001, False, 0.01)  # Move forward
     elif steps < 0:
-        motor.motor_go(False, "Full", abs(steps), 0.005, False, 0.01)  # Move backward
-        print(f"Moved {abs(steps)} steps backward")
+        motor.motor_go(False, "1/4", abs(steps), 0.001, False, 0.01)  # Move backward
     print(f"Motor moved by {steps} steps")
 
 
-def listen_for_focus_command(picam2):
+def listen_for_focus_command():
     """Listen for 'focus' command from terminal and trigger autofocus."""
     while True:
         command = input("Enter command: ").strip().lower()
-        if command == "focus":
-            hill_climb_focus(picam2)
+        if command == "start":
+            startup()
+        elif command == "focus":
+            hill_climb_focus()
         elif command == "exit":
             print("Exiting...")
             break
@@ -204,10 +231,11 @@ def listen_for_focus_command(picam2):
 if __name__ == "__main__":
     # Initialize Picamera2
     picam2 = Picamera2()
-    picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+    picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}))  # (640, 480)
+    picam2.set_controls({"Saturation": 0.0})
 
     # Start the streaming server in a separate thread
     threading.Thread(target=start_streaming_server, args=(picam2,), daemon=True).start()
 
     # Start listening for focus command in the main thread
-    listen_for_focus_command(picam2)
+    listen_for_focus_command()
