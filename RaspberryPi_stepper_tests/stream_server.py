@@ -32,6 +32,7 @@ STEP_SIZE = 150  # Adjust step size for the motor
 MAX_STEPS = 1500  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
 
+
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
         self.frame = None
@@ -39,8 +40,23 @@ class StreamingOutput(io.BufferedIOBase):
 
     def write(self, buf):
         with self.condition:
-            self.frame = buf
+            # Convert JPEG buffer to NumPy array
+            image_array = np.frombuffer(buf, dtype=np.uint8)
+
+            # Decode image from JPEG
+            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+            # Convert to grayscale
+            gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+            # Re-encode as JPEG
+            _, jpeg_buffer = cv2.imencode('.jpg', gray_image)
+
+            # Save the processed frame
+            self.frame = jpeg_buffer.tobytes()
+
             self.condition.notify_all()
+
 
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
@@ -90,11 +106,6 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
 
 def start_streaming_server(picam2):
     """Run the stream server while using the given Picamera2 instance."""
-    picam2.set_controls(
-        {
-            "AfMode": controls.AfModeEnum.Manual, "LensPosition": 10.0,
-        }
-    )
     global output
     output = StreamingOutput()  # Initialize output here
     picam2.start_recording(JpegEncoder(), FileOutput(output))
@@ -136,8 +147,10 @@ def hill_climb_focus(picam2):
     print("Starting autofocus...")
 
     for _ in range(MAX_STEPS):
-        # Move stepper motor (this can be connected to motor controls)
-        motor_move(step_size * direction)  # Move the motor by step_size * direction
+        # Move the motor by step_size * direction
+        motor_move(step_size * direction)  
+        current_position += step_size * direction  # Update position after moving
+
         time.sleep(0.8)  # Wait for vibrations to settle
 
         # Capture and evaluate sharpness
@@ -147,20 +160,21 @@ def hill_climb_focus(picam2):
 
         if sharpness > best_sharpness:
             best_sharpness = sharpness
-            best_position = current_position
+            best_position = current_position  # Store best position
         else:
-            # Reverse direction and decrease step size
+            # Reverse direction and reduce step size
             direction *= -1
             step_size = max(1, step_size // 2)
-
-        current_position += step_size * direction
 
         # Stop if step size is too small and sharpness is not improving
         if step_size == 1 and sharpness <= best_sharpness:
             break
 
     # Move to the best focus position
-    motor_move(best_position - current_position)
+    correction_steps = best_position - current_position
+    print(f"Moving back to best focus position: {best_position} (Correction: {correction_steps} steps)")
+    
+    motor_move(correction_steps)  # Move back to best position
     print(f"Best Focus Position: {best_position}, Sharpness: {best_sharpness}")
 
 
