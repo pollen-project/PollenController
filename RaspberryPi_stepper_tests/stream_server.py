@@ -28,8 +28,9 @@ PAGE = """\
 GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
 direction = 27  # Direction -> GPIO Pin
 step = 17  # Step -> GPIO Pin
-STEP_SIZE = 25  # Adjust step size for the motor
-MAX_STEPS = 2000  # Max number of steps to prevent an endless loop
+sensor = 22
+STEP_SIZE = 100  # Adjust step size for the motor
+MAX_STEPS = 10000  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
 
 
@@ -140,8 +141,10 @@ def calculate_sharpness():
 
 def startup():
     sharpness_list = []
-    motor_position = MAX_STEPS // 2 * -1
-    motor_move(motor_position)
+    motor_position = 0
+
+    while not GPIO.input(sensor):
+        motor_move(-50)
 
     for i in range(MAX_STEPS // STEP_SIZE):
         motor_move(STEP_SIZE)
@@ -169,13 +172,12 @@ def hill_climb_focus():
     direction = 1  # 1 for forward, -1 for backward
 
     print("Starting autofocus...")
-    motor_move(step_size * -1)
     best_sharpness = calculate_sharpness()
     print(f"Initial sharpness: {best_sharpness}")
 
     for _ in range(MAX_STEPS):
         # Move the motor by step_size * direction
-        motor_move(step_size * direction)  
+        motor_move(step_size * direction)
         current_position += step_size * direction  # Update position after moving
 
         time.sleep(0.2)  # Wait for vibrations to settle
@@ -185,16 +187,19 @@ def hill_climb_focus():
         print(f"Position: {current_position}, Sharpness: {sharpness}")
 
         sharpness_diff = sharpness - best_sharpness
-        if sharpness_diff > 0.5:
+
+        print(f"Position: {current_position}, Sharpness: {sharpness}, Diff: {sharpness_diff}")
+
+        if sharpness_diff >= 1:
             best_sharpness = sharpness
             best_position = current_position  # Store best position
-        elif sharpness_diff < 0.5:
+        elif sharpness_diff <= -1:
             # Reverse direction and reduce step size
             direction *= -1
             step_size = max(1, step_size // 2)
 
         # Stop if step size is too small and sharpness is not improving
-        if step_size == 1 and sharpness <= best_sharpness:
+        if step_size == 1 and abs(sharpness_diff) < 1:
             break
 
     # Move to the best focus position
@@ -207,9 +212,9 @@ def hill_climb_focus():
 
 def motor_move(steps):
     if steps > 0:
-        motor.motor_go(True, "1/4", steps, 0.001, False, 0.01)  # Move forward
+        motor.motor_go(True, "1/4", steps, 0.0005, False, 0.01)  # Move forward
     elif steps < 0:
-        motor.motor_go(False, "1/4", abs(steps), 0.001, False, 0.01)  # Move backward
+        motor.motor_go(False, "1/4", abs(steps), 0.0005, False, 0.01)  # Move backward
     print(f"Motor moved by {steps} steps")
 
 
@@ -229,6 +234,9 @@ def listen_for_focus_command():
 
 
 if __name__ == "__main__":
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(sensor, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
     # Initialize Picamera2
     picam2 = Picamera2()
     picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}))  # (640, 480)
