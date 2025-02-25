@@ -26,9 +26,9 @@ PAGE = """\
 </html>
 """
 GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
-direction = 27  # Direction -> GPIO Pin
-step = 17  # Step -> GPIO Pin
-sensor = 22
+direction = 17  # Direction -> GPIO Pin
+step = 4  # Step -> GPIO Pin
+sensor = 18
 STEP_SIZE = 100  # Adjust step size for the motor
 MAX_STEPS = 10000  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
