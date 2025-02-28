@@ -4,6 +4,7 @@ import socketserver
 from http import server
 from threading import Condition
 import time
+import datetime
 import numpy as np
 import cv2
 import RPi.GPIO as GPIO
@@ -26,12 +27,15 @@ PAGE = """\
 </html>
 """
 GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
-direction = 17  # Direction -> GPIO Pin
-step = 4  # Step -> GPIO Pin
+direction_focus = 17  # Direction -> GPIO Pin
+step_focus = 4  # Step -> GPIO Pin
+direction_tape = 22
+step_tape = 27
 sensor = 18
-STEP_SIZE = 100  # Adjust step size for the motor
-MAX_STEPS = 10000  # Max number of steps to prevent an endless loop
-motor = RpiMotorLib.A4988Nema(direction, step, GPIO_pins, "A4988")
+STEP_SIZE = 10  # Adjust step size for the motor
+MAX_STEPS = 3000  # Max number of steps to prevent an endless loop
+motor = RpiMotorLib.A4988Nema(direction_focus, step_focus, GPIO_pins, "A4988")
+motor_tape = RpiMotorLib.A4988Nema(direction_tape, step_tape, GPIO_pins, "A4988")
 
 
 class StreamingOutput(io.BufferedIOBase):
@@ -119,7 +123,7 @@ def start_streaming_server(picam2):
         picam2.stop_recording()
 
 
-# def perform_autofocus(picam2):                        //this was used for testing/prototyping and can be deleted
+# def perform_autofocus(picam2):                     
 #     """Trigger autofocus using the camera."""
 #     print("Triggering autofocus...")
 #     # Capture an image
@@ -217,6 +221,10 @@ def motor_move(steps):
         motor.motor_go(False, "1/4", abs(steps), 0.0005, False, 0.01)  # Move backward
     print(f"Motor moved by {steps} steps")
 
+def picture():
+    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
+    filename = f"image_{now}.jpg"  # Create filename
+    picam2.capture_file(filename)  # Save the image
 
 def listen_for_focus_command():
     """Listen for 'focus' command from terminal and trigger autofocus."""
@@ -229,6 +237,10 @@ def listen_for_focus_command():
         elif command == "exit":
             print("Exiting...")
             break
+        elif command == "1":
+            for i in range (0,10):
+                picture()
+                time.sleep(0.2)
         else:
             print("Unknown command. Type 'focus' to trigger autofocus or 'exit' to quit.")
 
