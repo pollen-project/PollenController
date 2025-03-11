@@ -5,7 +5,7 @@ from http import server
 import logging
 from picamera2.outputs import FileOutput
 from picamera2.encoders import JpegEncoder
-from camera import picam2
+from camera import picam2, denoise_image
 import threading
 import os
 
@@ -17,6 +17,7 @@ class StreamingOutput(io.BufferedIOBase):
 
     def write(self, buf):
         with self.condition:
+            #print(buf)
             self.frame = buf   # regular stream
             self.condition.notify_all()
 

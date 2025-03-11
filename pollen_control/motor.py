@@ -18,7 +18,7 @@ motors = {
 }
 
 
-def motor_en(motor, enable):
+def motor_enable(motor, enable):
     if motor == "focus":
         GPIO.output(motor_en_focus, enable)
     elif motor == "tape":
@@ -27,7 +27,7 @@ def motor_en(motor, enable):
 
 # Function to move motor
 def move_motor(motor, steps):
-    motor_en(motor, True)
+    motor_enable(motor, True)
 
     if steps > 0:
         motors[motor].motor_go(True, "Full", steps, 0.001, False, 0.01)  # Move forward
@@ -38,14 +38,14 @@ def move_motor(motor, steps):
     else:
         print("Motor stopped.")
 
-    motor_en(motor, False)
+    motor_enable(motor, False)
 
 
 def home_motor_a():
-    motor_en("focus", True)
+    motor_enable("focus", True)
     while not GPIO.input(sensor):
         motors["focus"].motor_go(False, "Full", 10, 0.001, False, 0.01)
-    motor_en("focus", False)
+    motor_enable("focus", False)
 
 def setup_motor():
     GPIO.setmode(GPIO.BCM)
