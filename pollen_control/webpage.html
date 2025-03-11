@@ -212,6 +212,26 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+        /**
+         * Zoom in or out on the stream image.
+         * @param {number} scaleFactor - The factor to scale the image by.
+         */
+        let currentZoom = 1;
+        function zoomStream(scaleFactor) {
+            const stream = document.getElementById('stream');
+            currentZoom *= scaleFactor;
+            stream.style.transform = `scale(${currentZoom})`;
+        }
+
+        /**
+         * Reset the stream zoom to its original size.
+         */
+        function resetZoom() {
+            const stream = document.getElementById('stream');
+            currentZoom = 1;
+            stream.style.transform = `scale(1)`;
+        }
     </script>
 
 </body>
