@@ -55,6 +55,13 @@
             margin: 10px 0;
         }
 
+        .stream-container img {
+            width: 640px;
+            height: 400px;
+            transition: transform 0.3s ease; /* Smooth zoom effect */
+        }
+
+
         /* Controls Grid Layout */
         .controls {
             display: grid;
@@ -122,7 +129,11 @@
 
         <!-- Video Stream -->
         <div class="stream-container">
-            <img src="stream.mjpg" width="640" height="400" />
+            <img id="stream" src="stream.mjpg" />
+            <br>
+            <button onclick="zoomStream(1.2)">🔍 Zoom In</button>
+            <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
+            <button onclick="resetZoom()">🔄 Reset</button>
         </div>
 
         <!-- Control Buttons -->
