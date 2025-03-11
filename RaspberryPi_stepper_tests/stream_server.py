@@ -39,6 +39,37 @@ motor = RpiMotorLib.A4988Nema(direction_focus, step_focus, GPIO_pins, "A4988")
 motor_tape = RpiMotorLib.A4988Nema(direction_tape, step_tape, GPIO_pins, "A4988")
 
 
+def denoise_image(buf):
+    image_array = np.frombuffer(buf, dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+
+    # Apply binary thresholding
+    _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+
+    # Find contours
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Set a minimum contour area (this will remove particles smaller than this size)
+    min_contour_area = 200  # Adjust this value based on your requirements
+
+    # Create a mask for large contours
+    mask = np.zeros_like(image)
+
+    for contour in contours:
+        if cv2.contourArea(contour) >= min_contour_area:
+            cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
+
+    # Apply the mask to the original image
+    denoised_image = cv2.bitwise_and(image, image, mask=mask)
+
+    # Optional: Apply additional denoising methods like Gaussian or median blur
+    # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
+
+    _, jpeg_buffer = cv2.imencode('.jpg', denoised_image)
+
+    return jpeg_buffer.tobytes()
+
+
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
         self.frame = None
@@ -61,7 +92,13 @@ class StreamingOutput(io.BufferedIOBase):
             # # Save the processed frame
             # self.frame = jpeg_buffer.tobytes()
 
-            self.frame = buf
+            ###########
+
+            # self.frame = denoise_image(buf)
+
+            #########
+
+            self.frame = buf   # regular stream
             self.condition.notify_all()
 
 
