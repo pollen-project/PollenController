@@ -50,17 +50,48 @@
             max-width: 800px;
         }
 
-        /* Video Stream Styling */
+        /* Stream Container: Prevents Overlapping */
         .stream-container {
-            margin: 10px 0;
-        }
-
-        .stream-container img {
+            position: relative;
             width: 640px;
             height: 400px;
-            transition: transform 0.3s ease; /* Smooth zoom effect */
+            overflow: hidden; /* Keeps the zoomed image inside */
+            border-radius: 12px;
+            border: 2px solid #396e25;
+            background-color: rgba(0, 0, 0, 0.1);
         }
 
+        /* Stream Image: Can Move Inside the Container */
+        .stream-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: grab;
+            transition: transform 0.3s ease;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .zoom-controls button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .zoom-controls button:hover {
+            background-color: #49894c;
+        }
 
         /* Controls Grid Layout */
         .controls {
@@ -130,7 +161,10 @@
         <!-- Video Stream -->
         <div class="stream-container">
             <img id="stream" src="stream.mjpg" />
-            <br>
+        </div>
+
+        <!-- Zoom Controls (MUST be below the stream) -->
+        <div class="zoom-controls">
             <button onclick="zoomStream(1.2)">🔍 Zoom In</button>
             <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
             <button onclick="resetZoom()">🔄 Reset</button>
@@ -213,25 +247,79 @@
                 .catch(error => console.error('Error:', error));
         }
 
+
+    /* --------------------------------- */
+    /*       Image Zoom and Drag         */
+    /* --------------------------------- */ 
+    
+        let currentZoom = 1;
+        let translateX = 0, translateY = 0;
+        let isDragging = false;
+        let lastMouseX = 0, lastMouseY = 0;
+        const stream = document.getElementById('stream');
+
         /**
          * Zoom in or out on the stream image.
          * @param {number} scaleFactor - The factor to scale the image by.
          */
-        let currentZoom = 1;
         function zoomStream(scaleFactor) {
-            const stream = document.getElementById('stream');
             currentZoom *= scaleFactor;
-            stream.style.transform = `scale(${currentZoom})`;
+            updateTransform();
         }
 
         /**
-         * Reset the stream zoom to its original size.
+         * Reset the stream zoom and position.
          */
         function resetZoom() {
-            const stream = document.getElementById('stream');
             currentZoom = 1;
-            stream.style.transform = `scale(1)`;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+            stream.style.cursor = "grab";
         }
+
+        /**
+         * Update the transform properties of the image.
+         */
+        function updateTransform() {
+            stream.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+        }
+
+        /**
+         * Start dragging the image.
+         */
+        stream.addEventListener('mousedown', (e) => {
+            if (currentZoom > 1) {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                stream.style.cursor = "grabbing";
+            }
+        });
+
+        /**
+         * Move the image while dragging.
+         */
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            translateX += (e.clientX - lastMouseX) / currentZoom;
+            translateY += (e.clientY - lastMouseY) / currentZoom;
+
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+
+            updateTransform();
+        });
+
+        /**
+         * Stop dragging when the mouse is released.
+         */
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            stream.style.cursor = "grab";
+        });
+
     </script>
 
 </body>
