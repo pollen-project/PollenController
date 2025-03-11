@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pollen Stream Control Panel</title>
+    <title>Pollen Stream Control</title>
 
     <style>
 
     /* --------------------------------- */
-    /*       Custom CSS Styling          */
+    /*       Modernized Styling          */
     /* --------------------------------- */
 
         /* Background Animation */
@@ -20,48 +20,54 @@
 
         /* General Page Styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Arial", sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: linear-gradient(45deg, #b1ff1f, #b7fe54, #51fffc, #4d5fff);
-            background-size: 400% 400%;
+            background: linear-gradient(120deg, #eef2f3, #98c6f5);
+            background-size: 300% 300%;
             animation: gradientAnimation 15s ease infinite;
         }
 
         /* Header Styling */
         h1 {
-            background-color: #396e25;
-            color: white;
-            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+            padding: 15px;
             width: 100%;
             margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Main Content Container */
+        /* Main Container */
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 90%;
             max-width: 800px;
+            margin-top: 15px;
         }
 
-        /* Stream Container: Prevents Overlapping */
+        /* Stream Container */
         .stream-container {
             position: relative;
-            width: 640px;
+            width: 100%;
+            max-width: 640px;
             height: 400px;
-            overflow: hidden; /* Keeps the zoomed image inside */
+            overflow: hidden;
             border-radius: 12px;
-            border: 2px solid #396e25;
-            background-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* Stream Image: Can Move Inside the Container */
+        /* Stream Image */
         .stream-container img {
             width: 100%;
             height: 100%;
@@ -72,98 +78,84 @@
 
         /* Zoom Controls */
         .zoom-controls {
-            margin-top: 10px;
             display: flex;
             gap: 10px;
             justify-content: center;
+            margin-top: 12px;
         }
 
-        .zoom-controls button {
-            padding: 8px 12px;
+        /* Buttons (Minimalistic, Modern Look) */
+        button {
+            padding: 10px 16px;
             font-size: 14px;
-            border-radius: 5px;
+            font-weight: bold;
+            border-radius: 8px;
             border: none;
-            background-color: #4CAF50;
+            background: #3b5998; /* Modern blue */
             color: white;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .zoom-controls button:hover {
-            background-color: #49894c;
+        /* Button Hover */
+        button:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
         }
 
-        /* Controls Grid Layout */
+        /* Controls Grid */
         .controls {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Two columns */
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             width: 100%;
+            max-width: 640px;
+            margin-top: 15px;
         }
 
-        /* Control Box Styling */
+        /* Control Group (Modern Card Design) */
         .control-group {
-            background: rgba(255, 255, 255, 0.5); /* Semi-transparent */
+            background: rgba(255, 255, 255, 0.4);
             padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
             text-align: center;
-            backdrop-filter: blur(8px); /* Frosted glass effect */
+            backdrop-filter: blur(12px);
         }
 
-        /* Button Styling */
-        button {
-            padding: 8px 12px;
-            margin: 5px;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 5px;
-            transition: background 0.2s ease;
-        }
-
-        /* Button Hover Effect */
-        button:hover {
-            background-color: #49894c;
-        }
-
-        /* Input Field Styling */
+        /* Input Field */
         input {
-            padding: 5px;
+            padding: 6px;
             font-size: 14px;
-            width: 60px;
+            width: 70px;
             text-align: center;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            border-radius: 6px;
+            border: 1px solid #bbb;
             margin-top: 5px;
         }
 
-        /* Full-Width Control Box (For Automatic Process) */
+        /* Full-Width Control Box */
         .wide-control {
             grid-column: span 2;
-            width: calc(100% - 30px);
+            width: (100% -30px);
         }
+
     </style>
 </head>
 <body>
 
-    <!-- --------------------------------- -->
-    <!--             Main HTML             -->
-    <!-- --------------------------------- -->
-
-    <!-- Page Title -->
-    <h1>Pollen Stream Control Panel</h1>
+    <!-- Header -->
+    <h1>Pollen Stream Control</h1>
 
     <div class="container">
 
-        <!-- Video Stream -->
+        <!-- Stream -->
         <div class="stream-container">
             <img id="stream" src="stream.mjpg" />
         </div>
 
-        <!-- Zoom Controls (MUST be below the stream) -->
+        <!-- Zoom Controls -->
         <div class="zoom-controls">
             <button onclick="zoomStream(1.2)">🔍 Zoom In</button>
             <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
@@ -178,7 +170,7 @@
                 <h3>Tape Control</h3>
                 <button onclick="sendCommand('tape', getValue('tape_steps', false))">Forward</button>
                 <button onclick="sendCommand('tape', getValue('tape_steps', true))">Backward</button>
-                <input type="number" id="tape_steps" min="1" max="100" value="100">
+                <input type="number" id="tape_steps" min="1" max="5000" value="100">
             </div>
 
             <!-- Focus Control -->
@@ -186,7 +178,7 @@
                 <h3>Focus Control</h3>
                 <button onclick="sendCommand('focus', getValue('focus_steps', false))">Forward</button>
                 <button onclick="sendCommand('focus', getValue('focus_steps', true))">Backward</button>
-                <input type="number" id="focus_steps" min="1" max="100" value="100">
+                <input type="number" id="focus_steps" min="1" max="5000" value="100">
             </div>
 
             <!-- Auto Focus -->
@@ -213,63 +205,20 @@
     <script>
 
     /* --------------------------------- */
-    /*       Functions and Logic         */
-    /* --------------------------------- */
-
-        /**
-         * Get the value from an input field.
-         * @param {string} id - The ID of the input field.
-         * @param {boolean} isNegative - Whether to make the value negative.
-         * @returns {string} - The processed input value.
-         */
-         function getValue(id, isNegative = false) {
-            let value = document.getElementById(id).value;
-            return isNegative ? `-${value}` : value; // Convert to negative if needed
-        }
-
-        /**
-         * Send a control command to the server.
-         * @param {string} command - The command name.
-         * @param {string} value - The optional value (e.g., number of steps).
-         */
-        function sendCommand(command, value = '') {
-            let url = `/control?cmd=${command}`;
-            if (value) {
-                url += `&value=${value}`;
-            }
-
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Command failed:', command);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-
-    /* --------------------------------- */
     /*       Image Zoom and Drag         */
-    /* --------------------------------- */ 
-    
+    /* --------------------------------- */
+
         let currentZoom = 1;
         let translateX = 0, translateY = 0;
         let isDragging = false;
         let lastMouseX = 0, lastMouseY = 0;
         const stream = document.getElementById('stream');
 
-        /**
-         * Zoom in or out on the stream image.
-         * @param {number} scaleFactor - The factor to scale the image by.
-         */
         function zoomStream(scaleFactor) {
             currentZoom *= scaleFactor;
             updateTransform();
         }
 
-        /**
-         * Reset the stream zoom and position.
-         */
         function resetZoom() {
             currentZoom = 1;
             translateX = 0;
@@ -278,16 +227,10 @@
             stream.style.cursor = "grab";
         }
 
-        /**
-         * Update the transform properties of the image.
-         */
         function updateTransform() {
             stream.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
         }
 
-        /**
-         * Start dragging the image.
-         */
         stream.addEventListener('mousedown', (e) => {
             if (currentZoom > 1) {
                 isDragging = true;
@@ -297,24 +240,15 @@
             }
         });
 
-        /**
-         * Move the image while dragging.
-         */
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-
             translateX += (e.clientX - lastMouseX) / currentZoom;
             translateY += (e.clientY - lastMouseY) / currentZoom;
-
             lastMouseX = e.clientX;
             lastMouseY = e.clientY;
-
             updateTransform();
         });
 
-        /**
-         * Stop dragging when the mouse is released.
-         */
         document.addEventListener('mouseup', () => {
             isDragging = false;
             stream.style.cursor = "grab";
