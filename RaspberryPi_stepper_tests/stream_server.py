@@ -18,24 +18,56 @@ import threading
 PAGE = """\
 <html>
 <head>
-<title>picamera2 MJPEG streaming demo</title>
+<title>Pollen stream</title>
 </head>
 <body>
-<h1>Picamera2 MJPEG Streaming Demo</h1>
 <img src="stream.mjpg" width="640" height="480" />
 </body>
 </html>
 """
-GPIO_pins = (14, 15, 18)  # Microstep Resolution MS1-MS3 -> GPIO Pin
+GPIO_pins = (0, 0, 0)  # Microstep Resolution MS1-MS3 -> GPIO Pin
 direction_focus = 17  # Direction -> GPIO Pin
 step_focus = 4  # Step -> GPIO Pin
 direction_tape = 22
 step_tape = 27
 sensor = 18
+motor_en_focus = 23
+motor_en_tape = 24
 STEP_SIZE = 10  # Adjust step size for the motor
-MAX_STEPS = 3000  # Max number of steps to prevent an endless loop
+MAX_STEPS = 4000  # Max number of steps to prevent an endless loop
 motor = RpiMotorLib.A4988Nema(direction_focus, step_focus, GPIO_pins, "A4988")
 motor_tape = RpiMotorLib.A4988Nema(direction_tape, step_tape, GPIO_pins, "A4988")
+
+
+def denoise_image(buf):
+    image_array = np.frombuffer(buf, dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+
+    # Apply binary thresholding
+    _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+
+    # Find contours
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Set a minimum contour area (this will remove particles smaller than this size)
+    min_contour_area = 200  # Adjust this value based on your requirements
+
+    # Create a mask for large contours
+    mask = np.zeros_like(image)
+
+    for contour in contours:
+        if cv2.contourArea(contour) >= min_contour_area:
+            cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
+
+    # Apply the mask to the original image
+    denoised_image = cv2.bitwise_and(image, image, mask=mask)
+
+    # Optional: Apply additional denoising methods like Gaussian or median blur
+    # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
+
+    _, jpeg_buffer = cv2.imencode('.jpg', denoised_image)
+
+    return jpeg_buffer.tobytes()
 
 
 class StreamingOutput(io.BufferedIOBase):
@@ -60,7 +92,13 @@ class StreamingOutput(io.BufferedIOBase):
             # # Save the processed frame
             # self.frame = jpeg_buffer.tobytes()
 
-            self.frame = buf
+            ###########
+
+            # self.frame = denoise_image(buf)
+
+            #########
+
+            self.frame = buf   # regular stream
             self.condition.notify_all()
 
 
@@ -168,57 +206,93 @@ def startup():
 
 
 def hill_climb_focus():
-    """Perform hill climbing to find the optimal focus position."""
-    best_position = 0
-    best_sharpness = 0
-    current_position = 0
-    step_size = STEP_SIZE
-    direction = 1  # 1 for forward, -1 for backward
+    """Robust hill climbing autofocus with initial coarse search."""
+    def measure_sharpness():
+        # Take several images, average sharpness for robustness
+        return sum(calculate_sharpness() for _ in range(3)) / 3
+
+    def initial_coarse_search():
+        """Scan a wide range to find rough focus area if initial sharpness is very low."""
+        print("Starting initial coarse search...")
+        best_sharpness = 0
+        best_position = 0
+        scan_range = 50  # Arbitrary large initial range
+
+        for offset in range(-scan_range, scan_range + 1, 5):
+            motor_move_to(start_position + offset)
+            time.sleep(0.1)
+            sharpness = measure_sharpness()
+            print(f"Coarse scan position {offset}: sharpness {sharpness}")
+
+            if sharpness > best_sharpness:
+                best_sharpness = sharpness
+                best_position = offset
+
+        motor_move_to(start_position + best_position)
+        print(f"Coarse search completed. Best position: {best_position}, Sharpness: {best_sharpness}")
+        return best_position, best_sharpness
 
     print("Starting autofocus...")
-    best_sharpness = calculate_sharpness()
-    print(f"Initial sharpness: {best_sharpness}")
+    
+    start_position = 0
+    while not GPIO.input(sensor):
+        motor_move(STEP_SIZE * -1)
+
+    initial_sharpness = measure_sharpness()
+    print(f"Initial sharpness: {initial_sharpness}")
+
+    if initial_sharpness < 10:  # Threshold for "very blurry"
+        offset, sharpness = initial_coarse_search()
+        motor_move_to(start_position + offset)
+    else:
+        sharpness = initial_sharpness
+
+    best_position = motor_get_position()
+    best_sharpness = sharpness
+
+    step_size = STEP_SIZE
+    direction = 1  # 1 = forward, -1 = backward
 
     for _ in range(MAX_STEPS):
-        # Move the motor by step_size * direction
+        # Move and wait for vibration to settle
         motor_move(step_size * direction)
-        current_position += step_size * direction  # Update position after moving
+        time.sleep(0.2)
 
-        time.sleep(0.2)  # Wait for vibrations to settle
-
-        # Capture and evaluate sharpness
-        sharpness = calculate_sharpness()
-        print(f"Position: {current_position}, Sharpness: {sharpness}")
+        sharpness = measure_sharpness()
+        position = motor_get_position()
 
         sharpness_diff = sharpness - best_sharpness
+        print(f"Position: {position}, Sharpness: {sharpness}, Diff: {sharpness_diff}")
 
-        print(f"Position: {current_position}, Sharpness: {sharpness}, Diff: {sharpness_diff}")
-
-        if sharpness_diff >= 1:
+        if sharpness > best_sharpness:
             best_sharpness = sharpness
-            best_position = current_position  # Store best position
-        elif sharpness_diff <= -1:
-            # Reverse direction and reduce step size
+            best_position = position
+        elif sharpness_diff < -1:
+            # Overshot: reverse and reduce step size
             direction *= -1
             step_size = max(1, step_size // 2)
 
-        # Stop if step size is too small and sharpness is not improving
-        if step_size == 1 and abs(sharpness_diff) < 1:
-            break
+        if step_size == 1 and abs(sharpness_diff) < 0.5:
+            break  # Converged
 
-    # Move to the best focus position
-    correction_steps = best_position - current_position
-    print(f"Moving back to best focus position: {best_position} (Correction: {correction_steps} steps)")
-    
-    motor_move(correction_steps)  # Move back to best position
-    print(f"Best Focus Position: {best_position}, Sharpness: {best_sharpness}")
+    # Return to best focus point
+    correction_steps = best_position - motor_get_position()
+    print(f"Returning to best focus position: {best_position} (Correction: {correction_steps} steps)")
+    motor_move(correction_steps)
+
+    print(f"Best Focus Position: {best_position}, Final Sharpness: {best_sharpness}")
 
 
 def motor_move(steps):
+    GPIO.output(motor_en_focus, True)
+
     if steps > 0:
-        motor.motor_go(True, "1/4", steps, 0.0005, False, 0.01)  # Move forward
+        motor.motor_go(True, "Full", steps, 0.0005, False, 0.01)  # Move forward
     elif steps < 0:
-        motor.motor_go(False, "1/4", abs(steps), 0.0005, False, 0.01)  # Move backward
+        motor.motor_go(False, "Full", abs(steps), 0.0005, False, 0.01)  # Move backward
+
+    GPIO.output(motor_en_focus, False)
+
     print(f"Motor moved by {steps} steps")
 
 def picture():
@@ -247,7 +321,12 @@ def listen_for_focus_command():
 
 if __name__ == "__main__":
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(sensor, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(sensor, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+    GPIO.setup(motor_en_focus, GPIO.OUT)
+    GPIO.setup(motor_en_tape, GPIO.OUT)
+
+    GPIO.output(motor_en_focus, False)
+    GPIO.output(motor_en_tape, False)
 
     # Initialize Picamera2
     picam2 = Picamera2()
