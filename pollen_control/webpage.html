@@ -235,6 +235,28 @@
     </div>
 
     <script>
+        /**
+         * Send a control command to the server.
+         * @param {string} command - The command name (e.g., 'tape', 'focus', 'autofocus').
+         * @param {string} value - Optional value for step-based commands (e.g., number of steps).
+         */
+        function sendCommand(command, value = '') {
+            let url = `http://127.0.0.1:8080/control?cmd=${command}`;
+            if (value) {
+                url += `&value=${value}`;
+            }
+
+            fetch(url, { method: 'GET' })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error(`Command failed: ${command}, Response:`, response);
+                    }
+                })
+                .catch(error => console.error('Error sending command:', error));
+        }
+        
+        
+        
         /* Image Zoom and Drag */
         let currentZoom = 1;
         let translateX = 0, translateY = 0;
