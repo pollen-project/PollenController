@@ -1,15 +1,15 @@
-# Initialize Picamera2
-from picamera2 import Picamera2
 import datetime
 import cv2
 import numpy as np
-from io import BytesIO
+from picamera2 import Picamera2
+
+
+denoise_toggle = False
 
 picam2 = Picamera2()
 picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}))  # (640, 480)
 picam2.set_controls({"Saturation": 1.0})
 
-denoise_toggle = False
 
 def camera_settings(mode):
     global denoise_toggle
@@ -19,24 +19,42 @@ def camera_settings(mode):
         picam2.set_controls({"Saturation": 1.0})
     if mode == "denoise":
         denoise_toggle = not denoise_toggle
-    
 
-def picture():
+
+def take_picture():
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
     filename = f"photos/image_{now}.jpg"  # Create filename
-        
-    img =denoise_image(picam2.capture_array())
-    
-    
-    
-    #cv2.imwrite(filename, processed)
-    #picam2.capture_file(filename)  # Save the image
 
-def denoise_image(buf):
+    camera_buf = picam2.capture_array()
+    image = denoise_image(camera_buf, True)
+    image_jpeg = encode_jpeg(image)
+    
+    with open(filename, 'wb') as f:
+        f.write(image_jpeg)
+
+
+def calculate_sharpness():
+    """Calculate sharpness using the Laplacian Variance method."""
+    image = picam2.capture_array()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+    return np.var(laplacian)
+
+
+def encode_jpeg(buf):
+    _, jpeg_buffer = cv2.imencode('.jpg', buf)
+    return jpeg_buffer.tobytes()
+
+
+def denoise_image(buf, input_array = False):
     if not denoise_toggle:
         return buf
-    
-    image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
+
+    if input_array:
+        image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
+    else:
+        image_array = np.frombuffer(buf, dtype=np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
 
     # Apply binary thresholding
     _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
@@ -60,7 +78,4 @@ def denoise_image(buf):
     # Optional: Apply additional denoising methods like Gaussian or median blur
     # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
 
-    _, jpeg_buffer = cv2.imencode('.jpg', denoised_image)
-
-
-    return jpeg_buffer.tobytes()
+    return denoised_image

@@ -1,5 +1,5 @@
 import automation as automation
-from camera import picam2, picture, camera_settings 
+from camera import picam2, take_picture, camera_settings
 from stream_server import start_stream
 from motor import setup_motor, move_motor
 from focus import focus
@@ -12,7 +12,7 @@ def main():
         command = input("Enter command: ").strip().lower()
         
         if command == "img":
-            picture()
+            take_picture()
 
         elif command =="set c":
             camera_settings("color")

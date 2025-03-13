@@ -1,17 +1,5 @@
-from camera import picam2
-import cv2
-from motor import motor_enable, move_motor
-import numpy as np
-
-
-
-def calculate_sharpness():
-    """Calculate sharpness using the Laplacian Variance method."""
-    image = picam2.capture_array()
-    
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
-    return np.var(laplacian)
+from camera import calculate_sharpness
+from motor import move_motor
 
 
 def focus():
@@ -26,6 +14,3 @@ def focus():
         print('Focus done')
     except KeyboardInterrupt:
         print('Focus cancelled')
-    
-
-

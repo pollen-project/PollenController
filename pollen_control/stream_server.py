@@ -1,24 +1,21 @@
-from threading import Condition
 import io
+import threading
 import socketserver
-from http import server
 import logging
+from http import server
 from picamera2.outputs import FileOutput
 from picamera2.encoders import JpegEncoder
 from camera import picam2, denoise_image
-import threading
-import os
 
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
         self.frame = None
-        self.condition = Condition()
+        self.condition = threading.Condition()
 
     def write(self, buf):
         with self.condition:
-            #print(buf)
-            self.frame = buf   # regular stream
+            self.frame = denoise_image(buf)
             self.condition.notify_all()
 
 
@@ -81,7 +78,9 @@ def start_streaming_server(picam2):
 
 
 def start_stream():
-    global PAGE 
+    global PAGE
+
     with open('webpage.html', 'r') as f:
         PAGE = f.read()
+
     threading.Thread(target=start_streaming_server, args=(picam2,), daemon=True).start()
