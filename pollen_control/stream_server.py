@@ -6,7 +6,7 @@ from http import server
 from picamera2.outputs import FileOutput
 from picamera2.encoders import JpegEncoder
 from camera import picam2, denoise_image
-
+from commands import handle_command
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -32,6 +32,19 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
+        elif self.path == '/control?cmd=take_picture':
+            try:
+                handle_command("img")  # Runs the function
+                
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.end_headers()
+                
+                self.wfile.write(b"Picture function executed successfully")  # Send a simple response
+            
+            except Exception as e:
+                self.send_error(500, f"Error executing picture function: {str(e)}")
+
         elif self.path == '/stream.mjpg':
             self.send_response(200)
             self.send_header('Age', 0)

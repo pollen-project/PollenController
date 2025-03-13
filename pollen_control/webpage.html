@@ -244,7 +244,7 @@
          * @param {string} value - Optional value for step-based commands (e.g., number of steps).
          */
         function sendCommand(command, value = '') {
-            let url = `http://127.0.0.1:8080/control?cmd=${command}`;
+            let url = `http://pollen2:8080/control?cmd=${command}`;
             if (value) {
                 url += `&value=${value}`;
             }
