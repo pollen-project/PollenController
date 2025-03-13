@@ -7,6 +7,7 @@ from picamera2.outputs import FileOutput
 from picamera2.encoders import JpegEncoder
 from camera import picam2, denoise_image
 from commands import handle_command
+from urllib.parse import urlparse, parse_qs
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -32,18 +33,29 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/control?cmd=take_picture':
+
+
+        elif self.path.startswith('/control'):
             try:
-                handle_command("img")  # Runs the function
-                
-                self.send_response(200)
-                self.send_header("Content-Type", "text/plain")
-                self.end_headers()
-                
-                self.wfile.write(b"Picture function executed successfully")  # Send a simple response
-            
+                # Parse query parameters
+                parsed_url = urlparse(self.path)
+                params = parse_qs(parsed_url.query)
+
+                if 'cmd' in params:
+                    cmd = params['cmd'][0]  # Extract the command
+                    handle_command(cmd)  # Pass it to your function
+
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/plain")
+                    self.end_headers()
+                    self.wfile.write(f"Executed command: {cmd}".encode())  # Send response
+
+                else:
+                    self.send_error(400, "Missing 'cmd' parameter")
+
             except Exception as e:
-                self.send_error(500, f"Error executing picture function: {str(e)}")
+                self.send_error(500, f"Error executing command: {str(e)}")
+
 
         elif self.path == '/stream.mjpg':
             self.send_response(200)

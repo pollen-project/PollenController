@@ -4,7 +4,7 @@ from focus import focus
 
 
 def handle_command(command):
-    if command == "img":
+    if command == "take_picture":
         take_picture()
 
     elif command == "set c":
@@ -20,12 +20,22 @@ def handle_command(command):
         steps = int(command[1:])
         move_motor("focus", steps)
 
+    elif command[:11] == "calibration":
+        steps = int(command[11:])
+        move_motor("focus", steps)
+
     elif command[0:1] == "b":
         steps = int(command[1:])
         move_motor("tape", steps)
 
+    elif command[:4] == "tape":
+        steps = int(command[4:])
+        move_motor("tape", steps)
+
     elif command == "focus":
         focus()
+    
+  
 
     else:
         print("Unknown command")

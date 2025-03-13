@@ -203,23 +203,23 @@
             <!-- Tape Control -->
             <div class="control-group">
                 <h3>Tape Control</h3>
-                <button onclick="sendCommand('tape', getValue('tape_steps', false))">Forward</button>
-                <button onclick="sendCommand('tape', getValue('tape_steps', true))">Backward</button>
+                <button onclick="sendCommand('tape', getValue('tape_steps')*-1)">Forward</button>
+                <button onclick="sendCommand('tape', getValue('tape_steps'))">Backward</button>
                 <input type="number" id="tape_steps" min="1" max="5000" value="100">
             </div>
 
             <!-- Focus Control -->
             <div class="control-group">
                 <h3>Focus Control</h3>
-                <button onclick="sendCommand('focus', getValue('focus_steps', false))">Forward</button>
-                <button onclick="sendCommand('focus', getValue('focus_steps', true))">Backward</button>
+                <button onclick="sendCommand('calibration', getValue('focus_steps'))">Forward</button>
+                <button onclick="sendCommand('calibration', getValue('focus_steps')*-1)">Backward</button>
                 <input type="number" id="focus_steps" min="1" max="5000" value="100">
             </div>
 
             <!-- Auto Focus -->
             <div class="control-group">
                 <h3>Auto Focus</h3>
-                <button onclick="sendCommand('autofocus')">Focus</button>
+                <button onclick="sendCommand('focus')">Focus</button>
             </div>
 
             <!-- Take Picture -->
@@ -243,10 +243,16 @@
          * @param {string} command - The command name (e.g., 'tape', 'focus', 'autofocus').
          * @param {string} value - Optional value for step-based commands (e.g., number of steps).
          */
+        function getValue(id){
+            return document.getElementById(id).value;
+            
+        }
+         
+
         function sendCommand(command, value = '') {
             let url = `http://pollen2:8080/control?cmd=${command}`;
             if (value) {
-                url += `&value=${value}`;
+                url += `${value}`;
             }
 
             fetch(url, { method: 'GET' })
