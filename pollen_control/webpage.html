@@ -6,19 +6,7 @@
     <title>Pollen Stream Control</title>
 
     <style>
-
-    /* --------------------------------- */
-    /*       Modernized Styling          */
-    /* --------------------------------- */
-
-        /* Background Animation */
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* General Page Styling */
+        /* Background Styling */
         body {
             font-family: "Arial", sans-serif;
             text-align: center;
@@ -30,6 +18,13 @@
             background: linear-gradient(120deg, #eef2f3, #98c6f5);
             background-size: 300% 300%;
             animation: gradientAnimation 15s ease infinite;
+        }
+
+        /* Animated Background */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* Header Styling */
@@ -45,19 +40,18 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Main Container */
+        /* Main Layout */
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 90%;
-            max-width: 800px;
+            width: 95%;
+            max-width: 1200px;
             margin-top: 15px;
         }
 
         /* Stream Container */
         .stream-container {
-            position: relative;
             width: 100%;
             max-width: 640px;
             height: 400px;
@@ -65,6 +59,11 @@
             border-radius: 12px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
             background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .streamAndZoom-container {
+            width: 100%;
+            max-width: 640px;
         }
 
         /* Stream Image */
@@ -84,7 +83,7 @@
             margin-top: 12px;
         }
 
-        /* Buttons (Minimalistic, Modern Look) */
+        /* Buttons Styling */
         button {
             padding: 10px 16px;
             font-size: 14px;
@@ -104,7 +103,7 @@
             transform: translateY(-2px);
         }
 
-        /* Controls Grid */
+        /* Controls Layout */
         .controls {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -114,7 +113,7 @@
             margin-top: 15px;
         }
 
-        /* Control Group (Modern Card Design) */
+        /* Control Box Styling */
         .control-group {
             background: rgba(255, 255, 255, 0.4);
             padding: 15px;
@@ -142,6 +141,36 @@
             margin-bottom: 20px;
         }
 
+        /* Responsive Layout for Horizontal Screens */
+        @media screen and (min-width: 1154px) {
+            .container {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                width: 90%;
+            }
+
+            .controls {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                width: 45%;
+                max-width: 500px;
+            }
+
+            .stream-container {
+                max-width: 700px;
+                height: 500px;
+            }
+            
+            .streamAndZoom-container {
+                width: 50%;
+                max-width: 700px;
+                height: 500px;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -151,21 +180,23 @@
 
     <div class="container">
 
-        <!-- Stream -->
-        <div class="stream-container">
-            <img id="stream" src="stream.mjpg" />
-        </div>
+        <div class="streamAndZoom-container">
+        <!-- Stream on Top -->
+            <div class="stream-container">
+                <img id="stream" src="stream.mjpg" />
+            </div>
 
         <!-- Zoom Controls -->
-        <div class="zoom-controls">
-            <button onclick="zoomStream(1.2)">🔍 Zoom In</button>
-            <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
-            <button onclick="resetZoom()">🔄 Reset</button>
+            <div class="zoom-controls">
+                 <button onclick="zoomStream(1.2)">🔍 Zoom In</button>
+                 <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
+                 <button onclick="resetZoom()">🔄 Reset</button>
+             </div>
+
         </div>
 
-        <!-- Control Buttons -->
+        <!-- Controls -->
         <div class="controls">
-
             <!-- Tape Control -->
             <div class="control-group">
                 <h3>Tape Control</h3>
@@ -204,11 +235,7 @@
     </div>
 
     <script>
-
-    /* --------------------------------- */
-    /*       Image Zoom and Drag         */
-    /* --------------------------------- */
-
+        /* Image Zoom and Drag */
         let currentZoom = 1;
         let translateX = 0, translateY = 0;
         let isDragging = false;
@@ -254,7 +281,6 @@
             isDragging = false;
             stream.style.cursor = "grab";
         });
-
     </script>
 
 </body>
