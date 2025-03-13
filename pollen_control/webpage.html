@@ -73,6 +73,9 @@
             object-fit: cover;
             cursor: grab;
             transition: transform 0.3s ease;
+            user-drag: none;  /* Prevents dragging on Safari */
+            -webkit-user-drag: none; /* Prevents dragging on WebKit browsers (Chrome, Safari) */
+            pointer-events: all; /* Ensures the image is interactive */
         }
 
         /* Zoom Controls */
@@ -303,6 +306,12 @@
             isDragging = false;
             stream.style.cursor = "grab";
         });
+
+        // Prevent image from being picked up as a draggable item
+        stream.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+        });
+
     </script>
 
 </body>
