@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pollen Stream Control</title>
-
     <style>
+        /*-------------------------------*/
+        /*                               */
+        /*          CSS Styling          */
+        /*                               */
+        /*-------------------------------*/
+
         /* Background Styling */
         body {
             font-family: "Arial", sans-serif;
@@ -194,6 +199,12 @@
 </head>
 <body>
 
+    <!--------------------------------> 
+    <!--                            -->
+    <!--            HTML            -->
+    <!--                            -->
+    <!--------------------------------> 
+
     <!-- Header -->
     <h1>Pollen Stream Control</h1>
 
@@ -203,6 +214,7 @@
     <div class="container">
 
         <div class="streamAndZoom-container">
+
         <!-- Stream on Top -->
             <div class="stream-container">
                 <img id="stream" src="stream.mjpg" />
@@ -214,11 +226,11 @@
                  <button onclick="zoomStream(0.8)">🔎 Zoom Out</button>
                  <button onclick="resetZoom()">🔄 Reset</button>
              </div>
-
         </div>
 
         <!-- Controls -->
         <div class="controls">
+
             <!-- Tape Control -->
             <div class="control-group">
                 <h3>Tape Control</h3>
@@ -266,10 +278,15 @@
                 <button onclick="sendCommand('start_process')">Start</button>
             </div>
         </div>
-
     </div>
 
     <script>
+
+        /*-------------------------------*/
+        /*                               */
+        /*       JavaScript & Logic      */
+        /*                               */
+        /*-------------------------------*/
 
         function getValue(id){
             return document.getElementById(id).value;
@@ -330,7 +347,6 @@
             document.getElementById("colorToggleButton").textContent = isGreyscale ? "Enable Color" : "Enable Greyscale";
         }
         
-        
         /* Image Zoom and Drag */
         let currentZoom = 1;
         let translateX = 0, translateY = 0;
@@ -384,6 +400,5 @@
         });
 
     </script>
-
 </body>
 </html>
