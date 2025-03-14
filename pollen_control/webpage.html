@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pollen Stream Control</title>
+    
     <style>
         /*-------------------------------*/
         /*                               */
@@ -161,6 +162,24 @@
             margin-bottom: 20px;
         }
 
+        /* Logo at Bottom Center (Not Fixed) */
+        .bottom-logo-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 30px; /* Adds spacing from last content */
+        }
+
+        .bottom-logo {
+            width: 80px; /* Adjust size as needed */
+            height: auto;
+            opacity: 0.9;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .bottom-logo:hover {
+            opacity: 1;
+        }
+
         /* Responsive Layout for Horizontal Screens */
         @media screen and (min-width: 1154px) {
             .container {
@@ -212,7 +231,6 @@
     <div id="statusBar" class="status-bar">Ready 🟢</div>
 
     <div class="container">
-
         <div class="streamAndZoom-container">
 
         <!-- Stream on Top -->
@@ -401,4 +419,14 @@
 
     </script>
 </body>
+
+    <!-- Logo at Bottom Center -->
+    <br>
+    <br>
+    <div class="bottom-logo-container">
+        <img src="Pollen_Logo.png" alt="Pollen Project Logo" class="bottom-logo">
+    </div>
+    <br>
+    <br>
+
 </html>
