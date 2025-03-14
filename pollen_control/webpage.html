@@ -228,6 +228,19 @@
                 <button onclick="sendCommand('take_picture')">Capture</button>
             </div>
 
+            <!-- DeNoise Stream -->
+            <div class="control-group">
+                <h3>DeNoise</h3>
+                <button id="denoiseButton" onclick="toggleDenoise()">Enable Denoise</button>
+            </div>
+
+            <!-- Color/Greyscale Stream -->
+            <div class="control-group">
+                <h3>Color Mode</h3>
+                <button id="colorToggleButton" onclick="toggleColorMode()">Enable Greyscale</button>
+            </div>
+
+
             <!-- Automatic Process -->
             <div class="control-group wide-control">
                 <h3>Automatic Process</h3>
@@ -238,16 +251,11 @@
     </div>
 
     <script>
-        /**
-         * Send a control command to the server.
-         * @param {string} command - The command name (e.g., 'tape', 'focus', 'autofocus').
-         * @param {string} value - Optional value for step-based commands (e.g., number of steps).
-         */
+
         function getValue(id){
             return document.getElementById(id).value;
             
         }
-         
 
         function sendCommand(command, value = '') {
             let url = `http://pollen2:8080/control?cmd=${command}`;
@@ -264,6 +272,32 @@
                 .catch(error => console.error('Error sending command:', error));
         }
         
+        /* DeNoise */
+        let isDenoiseOn = false; // Track denoise state
+
+        function toggleDenoise() {
+            isDenoiseOn = !isDenoiseOn; // Toggle state
+            
+            // Send only "denoise" as that’s the expected command
+            sendCommand("denoise");
+
+            // Update button text
+            document.getElementById("denoiseButton").textContent = isDenoiseOn ? "Disable Denoise" : "Enable Denoise";
+        }
+
+        /* Greyscale / color */
+        let isGreyscale = false; // Track color mode state
+
+        function toggleColorMode() {
+            isGreyscale = !isGreyscale; // Toggle state
+
+            // Send the correct command to backend
+            let command = isGreyscale ? "set g" : "set c";
+            sendCommand(command);
+
+            // Update button text dynamically
+            document.getElementById("colorToggleButton").textContent = isGreyscale ? "Enable Color" : "Enable Greyscale";
+        }
         
         
         /* Image Zoom and Drag */
