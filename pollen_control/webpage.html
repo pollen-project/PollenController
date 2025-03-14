@@ -277,7 +277,7 @@
         }
 
         function sendCommand(command, value = '') {
-            let url = `http://pollen2:8080/control?cmd=${command}`;
+            let url = `/control?cmd=${command}`;
             if (value) {
                 url += `${value}`;
             }
