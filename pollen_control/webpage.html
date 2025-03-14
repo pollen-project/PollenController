@@ -163,15 +163,19 @@
                 max-width: 500px;
             }
 
+            /* Ensure stream container maintains the correct aspect ratio */
             .stream-container {
-                max-width: 700px;
-                height: 500px;
+                max-width: 1024px;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1024 / 768;
             }
             
             .streamAndZoom-container {
                 width: 50%;
-                max-width: 700px;
-                height: 500px;
+                max-width: 1024px;
+                height: auto;
+                aspect-ratio: 1024 / 768;
             }
         }
         
