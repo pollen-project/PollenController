@@ -14,7 +14,6 @@ picam2.set_controls({"Saturation": 1.0})
 def camera_settings(mode):
     global denoise_toggle
     if mode == "grey":
-        picam2.set_controls({"Saturation": 0.0})   
     if mode == "color":
         picam2.set_controls({"Saturation": 1.0})
     if mode == "denoise":
@@ -50,11 +49,6 @@ def denoise_image(buf, input_array = False):
     if not denoise_toggle:
         return buf
 
-    if input_array:
-        image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
-    else:
-        image_array = np.frombuffer(buf, dtype=np.uint8)
-        image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
 
     # Apply binary thresholding
     _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
