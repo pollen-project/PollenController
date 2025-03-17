@@ -31,12 +31,8 @@ def move_motor(motor, steps):
 
     if steps > 0:
         motors[motor].motor_go(True, "Full", steps, 0.001, False, 0.01)  # Move forward
-        print(f"Moved motor {motor} {steps} steps forward")
     elif steps < 0:
         motors[motor].motor_go(False, "Full", abs(steps), 0.001, False, 0.01)  # Move backward
-        print(f"Moved motor {motor} {abs(steps)} steps backward")
-    else:
-        print("Motor stopped.")
 
     motor_enable(motor, False)
 

@@ -5,7 +5,7 @@ import logging
 from http import server
 from picamera2.outputs import FileOutput
 from picamera2.encoders import JpegEncoder
-from camera import picam2, denoise_image
+from camera import picam2, denoise_image, encode_jpeg
 from commands import handle_command
 from urllib.parse import urlparse, parse_qs
 
@@ -16,7 +16,7 @@ class StreamingOutput(io.BufferedIOBase):
 
     def write(self, buf):
         with self.condition:
-            self.frame = denoise_image(buf)
+            self.frame = denoise_image(buf, encode_jpeg=True)
             self.condition.notify_all()
 
 

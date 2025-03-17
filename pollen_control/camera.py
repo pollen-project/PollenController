@@ -50,7 +50,7 @@ def encode_jpeg(buf):
     return jpeg_buffer.tobytes()
 
 
-def denoise_image(buf, input_array = False):
+def denoise_image(buf, input_array = False, encode_jpeg = False):
     if not denoise_toggle:
         return buf
 
@@ -82,5 +82,9 @@ def denoise_image(buf, input_array = False):
 
     # Optional: Apply additional denoising methods like Gaussian or median blur
     # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
+
+    if encode_jpeg:
+        _, jpeg_buffer = cv2.imencode('.jpg', denoised_image)
+        return jpeg_buffer.tobytes()
 
     return denoised_image

@@ -7,7 +7,7 @@ def focus():
 
     try:
         sharpness = calculate_sharpness()
-        while sharpness < 20:
+        while sharpness < 15:
             move_motor("focus",10)
             sharpness = calculate_sharpness()
 
