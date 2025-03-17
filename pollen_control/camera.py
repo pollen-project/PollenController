@@ -5,6 +5,7 @@ from picamera2 import Picamera2
 
 
 denoise_toggle = False
+color_flag = True
 
 picam2 = Picamera2()
 picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}))  # (640, 480)
@@ -13,9 +14,13 @@ picam2.set_controls({"Saturation": 1.0})
 
 def camera_settings(mode):
     global denoise_toggle
+    global color_flag
     if mode == "grey":
+        picam2.set_controls({"Saturation": 0.0})  
+        color_flag = False 
     if mode == "color":
         picam2.set_controls({"Saturation": 1.0})
+        color_flag = True
     if mode == "denoise":
         denoise_toggle = not denoise_toggle
 
@@ -49,6 +54,12 @@ def denoise_image(buf, input_array = False):
     if not denoise_toggle:
         return buf
 
+    if color_flag == False:
+        if input_array:
+            image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
+        else:
+            image_array = np.frombuffer(buf, dtype=np.uint8)
+            image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
 
     # Apply binary thresholding
     _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
