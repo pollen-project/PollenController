@@ -54,7 +54,13 @@ def denoise_image(buf, input_array = False, encode_jpeg = False):
     if not denoise_toggle:
         return buf
 
-    if color_flag == False:
+    if color_flag:
+        if input_array:
+            image = cv2.cvtColor(buf, cv2.COLOR_BGR2RGB)
+        else:
+            image_array = np.frombuffer(buf, dtype=np.uint8)
+            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    else:
         if input_array:
             image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
         else:
