@@ -54,12 +54,17 @@ def denoise_image(buf, input_array = False, encode_jpeg = False):
     if not denoise_toggle:
         return buf
 
+
     if color_flag:
         if input_array:
-            image = cv2.cvtColor(buf, cv2.COLOR_BGR2RGB)
+            color_image = cv2.cvtColor(buf, cv2.COLOR_BGR2RGB)
+            image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
+            
         else:
+            color_image_array = np.frombuffer(buf, dtype=np.uint8)
+            color_image = cv2.imdecode(color_image_array, cv2.IMREAD_COLOR)
             image_array = np.frombuffer(buf, dtype=np.uint8)
-            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
     else:
         if input_array:
             image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
@@ -84,7 +89,11 @@ def denoise_image(buf, input_array = False, encode_jpeg = False):
             cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
 
     # Apply the mask to the original image
-    denoised_image = cv2.bitwise_and(image, image, mask=mask)
+    if color_flag == True:
+        denoised_image = cv2.bitwise_and(color_image, color_image, mask=mask)
+    else:
+        denoised_image = cv2.bitwise_and(image, image, mask=mask)
+
 
     # Optional: Apply additional denoising methods like Gaussian or median blur
     # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
