@@ -57,7 +57,7 @@ def take_picture():
     filename = f"photos/image_{now}{settings}.jpg"  # Create filename
    
     camera_buf = picam2.capture_array()
-    image = denoise_image(camera_buf, True)
+    image = denoise_image(camera_buf, input_array=True)
     image_jpeg = encode_jpeg(image)
     
     with open(filename, 'wb') as f:
@@ -81,23 +81,16 @@ def denoise_image(buf, input_array = False, encode_jpeg = False):
     if not denoise_toggle:
         return buf
 
+    is_color = color_flag
 
-    if color_flag == True:
-        if input_array:
-            color_image = cv2.cvtColor(buf, cv2.COLOR_BGR2RGB)
-            image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
-            
-        else:
-            color_image_array = np.frombuffer(buf, dtype=np.uint8)
-            color_image = cv2.imdecode(color_image_array, cv2.IMREAD_COLOR)
-            image_array = np.frombuffer(buf, dtype=np.uint8)
-            image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+    if input_array:
+        image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
+        color_image = cv2.cvtColor(buf, cv2.COLOR_BGR2RGB)
+
     else:
-        if input_array:
-            image = cv2.cvtColor(buf, cv2.COLOR_BGR2GRAY)
-        else:
-            image_array = np.frombuffer(buf, dtype=np.uint8)
-            image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+        image_array = np.frombuffer(buf, dtype=np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+        color_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
     # Apply binary thresholding
     _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
@@ -116,11 +109,8 @@ def denoise_image(buf, input_array = False, encode_jpeg = False):
             cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
 
     # Apply the mask to the original image
-    if color_flag == True:
-        denoised_image = cv2.bitwise_and(color_image, color_image, mask=mask)
-    else:
-        denoised_image = cv2.bitwise_and(image, image, mask=mask)
-
+    base_image = color_image if is_color else image
+    denoised_image = cv2.bitwise_and(base_image, base_image, mask=mask)
 
     # Optional: Apply additional denoising methods like Gaussian or median blur
     # denoised_image = cv2.GaussianBlur(denoised_image, (5, 5), 0)
