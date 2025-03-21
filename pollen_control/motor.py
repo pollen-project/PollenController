@@ -2,52 +2,28 @@ import RPi.GPIO as GPIO
 from RpiMotorLib import RpiMotorLib
 
 # Define GPIO Pins
-GPIO_pins = (0, 0, 0)  # Microstep Resolution MS1-MS3
-step_a = 4  # Step control pin
-direction_a = 17  # Direction control pin
-step_b = 27  # Step control pin
-direction_b = 22  # Direction control pin
 sensor = 18
-motor_en_focus = 23
-motor_en_tape = 24
 
 # Initialize the motor
 motors = {
-    'focus': RpiMotorLib.A4988Nema(direction_a, step_a, GPIO_pins, "A4988"),
-    'tape': RpiMotorLib.A4988Nema(direction_b, step_b, GPIO_pins, "A4988")
+    'focus': RpiMotorLib.BYJMotor("focus", "28BYJ"),
+    'tape': RpiMotorLib.BYJMotor("tape", "28BYJ")
 }
-
-
-def motor_enable(motor, enable):
-    if motor == "focus":
-        GPIO.output(motor_en_focus, enable)
-    elif motor == "tape":
-        GPIO.output(motor_en_tape, enable)
+motor_gpios = {
+    'focus': [5, 6, 13, 19],
+    'tape': [16, 20, 21, 26]
+}
 
 
 # Function to move motor
 def move_motor(motor, steps):
-    motor_enable(motor, True)
-
-    if steps > 0:
-        motors[motor].motor_go(True, "Full", steps, 0.001, False, 0.01)  # Move forward
-    elif steps < 0:
-        motors[motor].motor_go(False, "Full", abs(steps), 0.001, False, 0.01)  # Move backward
-
-    motor_enable(motor, False)
+    motors[motor].motor_run(motor_gpios[motor], 0.025, abs(steps), (steps < 0), False, "full", 0.01)
 
 
 def home_motor_a():
-    motor_enable("focus", True)
     while not GPIO.input(sensor):
-        motors["focus"].motor_go(False, "Full", 10, 0.001, False, 0.01)
-    motor_enable("focus", False)
+        move_motor("focus", -10)
 
 def setup_motor():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(sensor, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(motor_en_focus, GPIO.OUT)
-    GPIO.setup(motor_en_tape, GPIO.OUT)
-
-    GPIO.output(motor_en_focus, False)
-    GPIO.output(motor_en_tape, False)
