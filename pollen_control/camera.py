@@ -2,7 +2,7 @@ import datetime
 import cv2
 import numpy as np
 from picamera2 import Picamera2
-from time import sleep
+
 denoise_toggle = False
 color_flag = True
 
@@ -23,21 +23,28 @@ def camera_settings(mode):
     if mode == "denoise":
         denoise_toggle = not denoise_toggle
 
+
 def take_picture_all():
     global color_flag, denoise_toggle
-    camera_settings("color")
-    take_picture()
-    denoise_toggle = not denoise_toggle
+
+    initial_color_flag = color_flag
+    initial_denoise_flag = denoise_toggle
+
+    # Color ON, denoise OFF
+    color_flag = True
+    denoise_toggle = False
     take_picture()
 
-    camera_settings("grey")
+    # Color ON, denoise ON
+    denoise_toggle = True
     take_picture()
-    denoise_toggle = not denoise_toggle
-    take_picture
 
-            
-    
-    
+    # Color OFF, denoise ON
+    color_flag = False
+    take_picture()
+
+    color_flag = initial_color_flag
+    denoise_toggle = initial_denoise_flag
 
 
 def take_picture():
@@ -45,8 +52,6 @@ def take_picture():
     
     noise_status = "" if not denoise_toggle else "dn"
     color_status = "G" if not color_flag else "C"
-
-
 
     settings = color_status+noise_status
     filename = f"photos/image_{now}{settings}.jpg"  # Create filename
