@@ -22,6 +22,10 @@ def camera_settings(mode):
         color_flag = True
     if mode == "denoise":
         denoise_toggle = not denoise_toggle
+    if mode == "denoise on":
+        denoise_toggle = True
+    if mode == "denoise off":
+        denoise_toggle = False
 
 
 def take_picture_all():

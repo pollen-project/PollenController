@@ -20,10 +20,10 @@ class Motor:
 
     def move(self, steps):
         if steps > 0:
-            if self.position >= self.__end_position:
+            if self.__end_position and self.position >= self.__end_position:
                 return False
 
-            if self.position + steps > self.__end_position:
+            if self.__end_position and self.position + steps > self.__end_position:
                 steps = (self.position + steps) - self.__end_position
 
             self.__motor_run(steps)

@@ -1,0 +1,14 @@
+[Unit]
+Description=Pollen
+
+[Service]
+Type=exec
+Restart=always
+RestartSec=10
+User=pi
+UMask=0000
+WorkingDirectory=/home/pi/pollen_control
+ExecStart=/usr/bin/python3 /home/pi/pollen_control/auto.py
+
+[Install]
+WantedBy=multi-user.target
