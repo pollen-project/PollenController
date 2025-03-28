@@ -13,9 +13,10 @@ def focus():
     increase_counter = 0
     decrease_counter = 0
     peak_found = False
+    time_running = 0
 
     try:
-        while True:
+        while time_running < 200:
             result = motor.move(step_size * direction)
 
             if not result:
@@ -53,6 +54,8 @@ def focus():
 
             previous_sharpness = sharpness
             print(f"[focus] sharpness={sharpness} best_sharpness={best_sharpness} increase_counter={increase_counter} decrease_counter={decrease_counter} peak_found={str(peak_found)} position={motor.position}")
+
+            time_running += 1
 
 
         # sharpness = calculate_sharpness()
