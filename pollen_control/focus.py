@@ -6,7 +6,7 @@ from motor import motors
 
 def focus():
     step_size = 10
-    direction = 1  # 1 for forward, -1 for backwars
+    direction = 1  # 1 for forward, -1 for backwards
     motor = motors["focus"]
     previous_sharpness = 0
     best_sharpness = 0
