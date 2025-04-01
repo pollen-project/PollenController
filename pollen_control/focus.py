@@ -1,68 +1,62 @@
-from math import floor
-
 from camera import calculate_sharpness
 from motor import motors
 
-
 def focus():
-    step_size = 10
-    direction = 1  # 1 for forward, -1 for backwards
     motor = motors["focus"]
-    previous_sharpness = 0
+    step_size = 2
+    max_steps = 60
+
+    print("[focus] Starting coarse scan to find best focus...")
+
     best_sharpness = 0
-    increase_counter = 0
-    decrease_counter = 0
-    peak_found = False
-    time_running = 0
+    best_step_index = 0
+    sharpness_log = []
 
-    try:
-        while time_running < 200:
-            result = motor.move(step_size * direction)
+    # --------- PHASE 1: Scan forward and find peak ----------
+    for i in range(max_steps):
+        sharpness = calculate_sharpness()
+        sharpness_log.append(sharpness)
+        print(f"[focus] Step {i}, Sharpness: {sharpness:.2f}")
 
-            if not result:
-                direction *= -1
+        if sharpness > best_sharpness:
+            best_sharpness = sharpness
+            best_step_index = i
 
-            sharpness = floor(calculate_sharpness())
+        if i > best_step_index + 2 and sharpness < best_sharpness * 0.97:
+            print("[focus] Sharpness dropped after peak — stopping scan.")
+            break
 
-            if peak_found:
-                if sharpness + 1 >= best_sharpness:
-                    break
-            else:
-                if sharpness > previous_sharpness:
-                    increase_counter += 1
+        motor.move(step_size)
 
-                    # if increase_counter == 3:
-                    #     step_size = 5
+    print(f"[focus] Coarse scan complete. Best sharpness: {best_sharpness:.2f} at step {best_step_index}")
 
-                elif sharpness < previous_sharpness:
-                    if increase_counter > 0:
-                        decrease_counter += 1
+    # --------- PHASE 2: Backtrack live by sharpness ----------
+    print("[focus] Re-approaching best focus with live sharpness check...")
 
-                        if decrease_counter >= 3:
-                            direction *= -1
-                            step_size = 5
-                            increase_counter = 0
-                            decrease_counter = 0
-                            peak_found = True
+    current_sharpness = calculate_sharpness()
+    last_sharpness = current_sharpness
+    reverse_attempts = 0
+    max_reverse_attempts = 20
+    found_peak = False
 
-                else:
-                    increase_counter = 0
-                    decrease_counter = 0
+    for i in range(max_reverse_attempts):
+        motor.move(-1)  # small backstep
 
-                if sharpness > best_sharpness:
-                    best_sharpness = sharpness
+        sharpness = calculate_sharpness()
+        print(f"[focus] Backtrack step {i}, Sharpness: {sharpness:.2f}")
 
-            previous_sharpness = sharpness
-            print(f"[focus] sharpness={sharpness} best_sharpness={best_sharpness} increase_counter={increase_counter} decrease_counter={decrease_counter} peak_found={str(peak_found)} position={motor.position}")
+        if sharpness >= best_sharpness * 0.995:
+            found_peak = True
+            print("[focus] Reached best sharpness region again.")
+            break
 
-            time_running += 1
+        if sharpness < last_sharpness * 0.98:
+            print("[focus] Sharpness dropped further — maybe overshot.")
+            break
 
+        last_sharpness = sharpness
 
-        # sharpness = calculate_sharpness()
-        # while sharpness < 15:
-        #     motors["focus"].move(10)
-        #     sharpness = calculate_sharpness()
+    if not found_peak:
+        print("[focus] WARNING: Failed to return to sharpest point.")
 
-        print('Focus done')
-    except KeyboardInterrupt:
-        print('Focus cancelled')
+    print(f"[focus] Final focus: Sharpness ≈ {calculate_sharpness():.2f} — autofocus complete.")
