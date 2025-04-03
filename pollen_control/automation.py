@@ -8,7 +8,7 @@ from focus import focus
 # Pollen number calculation variables
 IMAGE_SPACING_MM = 1
 EXPOSURE_TIME_SEC = 1800
-TEST_EXPOSURE_TIME_SEC = 60
+TEST_EXPOSURE_TIME_SEC = 120
 
 # Physical dimensions
 SAMPLE_AREA_MM = 30
@@ -35,7 +35,7 @@ def auto_take_pictures_task(testing=False):
     while auto_running:
         motors["tape"].move(tape_steps * -1)
 
-        if startup_steps >= first_sample_steps:
+        if startup_steps >= first_sample_steps or testing:
             focus()
             take_picture()
         else:
