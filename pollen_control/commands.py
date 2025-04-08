@@ -1,8 +1,7 @@
 from camera import take_picture, camera_settings, take_picture_all
 from motor import motors
 from focus import focus
-from automation import auto_take_pictures, auto_stop
-from fan import fan_on, fan_off
+from automation import start_auto_picture_loop, auto_stop
 
 
 def handle_command(command):
@@ -36,19 +35,13 @@ def handle_command(command):
         focus()
 
     elif command == "auto":
-        auto_take_pictures()
+        start_auto_picture_loop()
 
     elif command == "auto test":
-        auto_take_pictures(testing=True)
+        start_auto_picture_loop(testing=True)
 
     elif command == "auto stop":
         auto_stop()
-
-    elif command == "fan_on":
-        fan_on()
-
-    elif command == "fan_off":
-        fan_off()
 
     elif command[0:1] == "a":
         steps = int(command[1:])
