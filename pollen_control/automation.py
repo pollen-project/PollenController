@@ -10,7 +10,7 @@ from fan import fan_on, fan_off
 # Pollen number calculation variables
 IMAGE_SPACING_MM = 1
 EXPOSURE_TIME_SEC = 1800
-TEST_EXPOSURE_TIME_SEC = 60
+TEST_EXPOSURE_TIME_SEC = 300
 
 # Physical dimensions
 SAMPLE_AREA_MM = 30
