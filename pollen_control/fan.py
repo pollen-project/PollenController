@@ -8,10 +8,10 @@ GPIO.setup(RELAY_PIN, GPIO.OUT)
 # Turn fan ON initially (relay not triggered)
 GPIO.output(RELAY_PIN, GPIO.LOW)
 
-def fan_off():
+def fan_on():
     GPIO.output(RELAY_PIN, GPIO.HIGH)  # Trigger relay = FAN OFF
 
-def fan_on():
+def fan_off():
     GPIO.output(RELAY_PIN, GPIO.LOW)  # Relay idle = FAN ON
 
 def cleanup():

@@ -5,11 +5,12 @@ from motor import motors
 from focus import focus
 from uploading import upload_image
 from concurrent.futures import ThreadPoolExecutor
+from fan import fan_on, fan_off
 
 # Pollen number calculation variables
 IMAGE_SPACING_MM = 1
 EXPOSURE_TIME_SEC = 1800
-TEST_EXPOSURE_TIME_SEC = 60
+TEST_EXPOSURE_TIME_SEC = 300
 
 # Physical dimensions
 SAMPLE_AREA_MM = 30
@@ -27,8 +28,11 @@ def auto_take_pictures_task(testing=False):
     print("Taking picture with tape step:", tape_steps)
 
     motors["tape"].move(tape_steps * -1)
+    fan_off()
+    sleep(5.0)
     focus()
     take_picture()
+    fan_on()
     
 
 
@@ -39,6 +43,8 @@ def start_auto_picture_loop(testing=False):
     exposure_time = TEST_EXPOSURE_TIME_SEC if testing else EXPOSURE_TIME_SEC
     sample_area_image_count = SAMPLE_AREA_MM / IMAGE_SPACING_MM
     image_freq_sec = exposure_time / sample_area_image_count
+
+    fan_on()
 
     # Replace with your actual camera + motor logic
     camera_settings("color")
@@ -57,3 +63,4 @@ def start_auto_picture_loop(testing=False):
 def auto_stop():
     global auto_running
     auto_running = False
+    fan_off()
