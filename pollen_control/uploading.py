@@ -49,12 +49,12 @@ def upload_image(image_bytes, filename, retries: int = 3, backoff: int = 2) -> N
     for attempt in range(1, retries + 1):
         try:
             # Create a file-like object from the bytes
-            files = {'file': ("pollen2", image_bytes, 'image/jpeg')}
+            files = {'image': ("pollen3", image_bytes, 'image/jpeg')}
             response = requests.post(url, files=files, data=data, timeout=10)
             print(response)
             if response.status_code == 200:
                 print(f"✅ Upload successful on attempt {attempt}")
-                print("Response:", response.json())
+                #print("Response:", response.json())
                 print(f"Uploaded image: {filename}")
                 break
             else:
