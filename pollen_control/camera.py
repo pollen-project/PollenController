@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from picamera2 import Picamera2
 from uploading import add_to_upload_queue
+import time  
+from fan import fan_off, fan_on  
 
 denoise_toggle = False
 color_flag = True
@@ -35,24 +37,38 @@ def take_picture_all():
     initial_color_flag = color_flag
     initial_denoise_flag = denoise_toggle
 
+    # ---- FAN OFF ----
+    fan_off()
+    time.sleep(5.0)  # Wait for it to stop spinning
+
     # Color ON, denoise OFF
     color_flag = True
     denoise_toggle = False
-    take_picture()
+    take_picture(fan_control=False)
 
     # Color ON, denoise ON
     denoise_toggle = True
-    take_picture()
+    take_picture(fan_control=False)
 
     # Color OFF, denoise ON
     color_flag = False
-    take_picture()
+    take_picture(fan_control=False)
 
+    # ---- FAN ON ----
+    fan_on()
+    time.sleep(5.0)  # Wait for it to spin up again
+
+    # Restore original state
     color_flag = initial_color_flag
     denoise_toggle = initial_denoise_flag
 
 
-def take_picture():
+def take_picture(fan_control=True):
+    # ---- FAN OFF ----
+    if fan_control:
+        fan_off()
+        time.sleep(5.0)  # Wait 5.0 seconds for fan to stop
+
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
     
     noise_status = "" if not denoise_toggle else "dn"
@@ -68,8 +84,12 @@ def take_picture():
     with open(filename, 'wb') as f:
         f.write(image_jpeg)
         add_to_upload_queue(image_jpeg, filename)
-    
 
+    # ---- FAN ON ----
+    if fan_control:
+        fan_on()
+        time.sleep(5.0)  # Wait for fan to spin up again
+    
 
 
 def calculate_sharpness():
