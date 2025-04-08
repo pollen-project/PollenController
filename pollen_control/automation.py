@@ -43,6 +43,7 @@ def start_auto_picture_loop(testing=False):
     # Replace with your actual camera + motor logic
     camera_settings("color")
     camera_settings("denoise off")
+    print("Returning Home")
     motors["focus"].home()
 
     with ThreadPoolExecutor(max_workers=1) as executor:

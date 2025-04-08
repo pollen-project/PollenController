@@ -1,5 +1,6 @@
 from camera import calculate_sharpness
 from motor import motors
+from time import sleep
 
 def focus():
     motor = motors["focus"]
@@ -27,6 +28,7 @@ def focus():
             break
 
         motor.move(step_size)
+        #sleep(2)
 
     print(f"[focus] Coarse scan complete. Best sharpness: {best_sharpness:.2f} at step {best_step_index}")
 

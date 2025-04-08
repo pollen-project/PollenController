@@ -23,7 +23,7 @@ def start_upload_queue():
                 # Pop the first image and filename from the queue
                 image, filename = upload_queue.pop(0)
                 upload_image(image, filename)
-                print(f"Uploaded image: {filename}")
+                
 
             
 
@@ -41,7 +41,7 @@ def upload_image(image_bytes, filename, retries: int = 3, backoff: int = 2) -> N
         print("No image data provided.")
         return
 
-    url = 'https://httpbin.org/post'
+    url = 'https://pollen.botondhorvath.com/api/upload'
     data = {
         'filename': filename,
     }
@@ -51,10 +51,11 @@ def upload_image(image_bytes, filename, retries: int = 3, backoff: int = 2) -> N
             # Create a file-like object from the bytes
             files = {'file': ("pollen2", image_bytes, 'image/jpeg')}
             response = requests.post(url, files=files, data=data, timeout=10)
-
+            print(response)
             if response.status_code == 200:
                 print(f"✅ Upload successful on attempt {attempt}")
-                #print("Response:", response.json())
+                print("Response:", response.json())
+                print(f"Uploaded image: {filename}")
                 break
             else:
                 print(f"⚠️ Attempt {attempt} failed with status code {response.status_code}")
