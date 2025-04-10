@@ -3348,6 +3348,220 @@
 				)
 			)
 		)
+		(symbol "Transistor_BJT:PN2222A"
+			(pin_names
+				(offset 0) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "Q"
+				(at 5.08 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "PN2222A"
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
+				(at 5.08 -1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.onsemi.com/pub/Collateral/PN2222-D.PDF"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Description" "1A Ic, 40V Vce, NPN Transistor, General Purpose Transistor, TO-92"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "NPN Transistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "TO?92*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "PN2222A_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0.635 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54) (xy 0.635 -0.635)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 2.54) (xy 0.635 0.635)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.635 1.905) (xy 0.635 -1.905) (xy 0.635 -1.905)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.413 -2.413) (xy 1.905 -1.905) (xy 1.905 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.143 -1.651) (xy 1.651 -1.143) (xy 2.159 -2.159) (xy 1.143 -1.651) (xy 1.143 -1.651)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 0)
+					(radius 2.8194)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "PN2222A_1_1"
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "E"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -5.08 0 0)
+					(length 5.08)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "power:+3.3V"
 			(power)
 			(pin_numbers hide)
@@ -3698,6 +3912,12 @@
 		(uuid "2ecf5315-d8f2-4337-abf7-2bf3992a7c1d")
 	)
 	(junction
+		(at 128.27 181.61)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7c7c2c25-96c7-44d3-b249-99fe9f6dd547")
+	)
+	(junction
 		(at 49.53 130.81)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3739,6 +3959,16 @@
 	)
 	(wire
 		(pts
+			(xy 92.71 175.26) (xy 110.49 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "039a9aeb-ac2f-4871-9ef1-b4e963c55611")
+	)
+	(wire
+		(pts
 			(xy 123.19 74.93) (xy 139.7 74.93)
 		)
 		(stroke
@@ -3746,6 +3976,16 @@
 			(type default)
 		)
 		(uuid "051cb65e-48e4-4037-9801-dc20a0ee4060")
+	)
+	(wire
+		(pts
+			(xy 128.27 182.88) (xy 128.27 181.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0929ff99-40a3-415c-87db-f1e8264d7b8a")
 	)
 	(wire
 		(pts
@@ -3759,6 +3999,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 160.02) (xy 143.51 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0caaa0f6-fc11-4c64-898e-786424010671")
+	)
+	(wire
+		(pts
 			(xy 43.18 170.18) (xy 52.07 170.18)
 		)
 		(stroke
@@ -3766,6 +4016,36 @@
 			(type default)
 		)
 		(uuid "0d692d97-a91d-4584-b3fb-33276a5efa01")
+	)
+	(wire
+		(pts
+			(xy 92.71 44.45) (xy 110.49 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0deb3e3e-6f66-4168-a717-1894e4330093")
+	)
+	(wire
+		(pts
+			(xy 143.51 162.56) (xy 146.05 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "10341587-d9e9-4e3f-80ec-f01b817e8377")
+	)
+	(wire
+		(pts
+			(xy 128.27 181.61) (xy 128.27 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "103b7e1f-d93c-4932-855b-ce1da2cd69ef")
 	)
 	(wire
 		(pts
@@ -4069,6 +4349,16 @@
 	)
 	(wire
 		(pts
+			(xy 128.27 170.18) (xy 128.27 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a13e95c-e2fa-4471-b9b8-e979ce902e25")
+	)
+	(wire
+		(pts
 			(xy 49.53 52.07) (xy 52.07 52.07)
 		)
 		(stroke
@@ -4369,6 +4659,16 @@
 	)
 	(wire
 		(pts
+			(xy 146.05 165.1) (xy 143.51 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b2b94f1c-0fcf-43ba-af96-18cf3a412b3f")
+	)
+	(wire
+		(pts
 			(xy 43.18 115.57) (xy 39.37 115.57)
 		)
 		(stroke
@@ -4399,6 +4699,16 @@
 	)
 	(wire
 		(pts
+			(xy 118.11 175.26) (xy 120.65 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c3b35988-9744-4be8-8395-6b4971932274")
+	)
+	(wire
+		(pts
 			(xy 208.28 91.44) (xy 220.98 91.44)
 		)
 		(stroke
@@ -4426,6 +4736,16 @@
 			(type default)
 		)
 		(uuid "cb69cd38-d46c-4d0a-b36c-305ce06679b3")
+	)
+	(wire
+		(pts
+			(xy 128.27 167.64) (xy 146.05 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cc844cf9-fe02-4b60-b10b-8aaf61b068ab")
 	)
 	(wire
 		(pts
@@ -4559,6 +4879,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 181.61) (xy 128.27 181.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e19b6d29-3e4d-4f19-9c28-f003d77936f4")
+	)
+	(wire
+		(pts
 			(xy 123.19 36.83) (xy 139.7 36.83)
 		)
 		(stroke
@@ -4639,6 +4969,16 @@
 	)
 	(wire
 		(pts
+			(xy 143.51 165.1) (xy 143.51 181.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f75ab532-cae9-471c-89d6-dc2a5de75e06")
+	)
+	(wire
+		(pts
 			(xy 39.37 39.37) (xy 41.91 39.37)
 		)
 		(stroke
@@ -4656,6 +4996,17 @@
 			(type default)
 		)
 		(uuid "ff95e9ec-0f9c-4e42-964c-848b9bf119ac")
+	)
+	(label "FAN_CONTROL"
+		(at 92.71 44.45 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0d804721-ba8f-4091-83e1-f8fa41fe4225")
 	)
 	(label "NB-IOT_RX"
 		(at 124.46 34.29 0)
@@ -4943,6 +5294,17 @@
 		)
 		(uuid "c6799aa1-7c68-4246-9a30-602e69a07554")
 	)
+	(label "FAN_CONTROL"
+		(at 92.71 175.26 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cfa4cd0f-ffea-48a0-a90f-d602f7ef4c2e")
+	)
 	(label "MOTOR_FOCUS_1"
 		(at 92.71 64.77 0)
 		(fields_autoplaced yes)
@@ -5197,6 +5559,78 @@
 			(project ""
 				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
 					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x03")
+		(at 151.13 165.1 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "134e5766-5e35-4366-bbc9-7d14346b5d30")
+		(property "Reference" "J9"
+			(at 153.67 163.8299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Fan"
+			(at 153.67 166.3699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
+			(at 151.13 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 151.13 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 151.13 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "3031cb3c-4b37-4781-9a96-3806016ecc9e")
+		)
+		(pin "1"
+			(uuid "decff13e-c476-4f34-8d05-0b3527371452")
+		)
+		(pin "2"
+			(uuid "0d4f5cea-f073-49be-a053-4426ca6954d1")
+		)
+		(instances
+			(project "pollen_controller_pcb"
+				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
+					(reference "J9")
 					(unit 1)
 				)
 			)
@@ -5473,6 +5907,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 128.27 182.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1d786ce2-bf02-482d-8ea9-1bab09f93ec1")
+		(property "Reference" "#PWR029"
+			(at 128.27 189.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 128.27 187.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 128.27 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 128.27 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 128.27 182.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "83315602-8ce6-4982-8600-1f8a0bd9770f")
+		)
+		(instances
+			(project "pollen_controller_pcb"
+				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
+					(reference "#PWR029")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
 		(at 34.29 39.37 0)
 		(mirror y)
@@ -5603,6 +6103,72 @@
 			(project "pollen_controller_pcb"
 				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
 					(reference "#PWR024")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 143.51 160.02 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2b456186-e688-477d-ae40-eb1a402d3344")
+		(property "Reference" "#PWR030"
+			(at 143.51 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 143.51 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 143.51 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 143.51 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 143.51 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fb117aba-854c-4ed2-9252-08486b2e5219")
+		)
+		(instances
+			(project "pollen_controller_pcb"
+				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
+					(reference "#PWR030")
 					(unit 1)
 				)
 			)
@@ -5987,6 +6553,74 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 114.3 175.26 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "433ee580-c13f-4ca7-9b04-931f4efb7902")
+		(property "Reference" "R6"
+			(at 114.3 168.91 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "4k7"
+			(at 114.3 171.45 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 114.3 177.038 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 114.3 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 114.3 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0fe3f26d-75cc-48dc-8f15-eea139eee46e")
+		)
+		(pin "2"
+			(uuid "90821268-92d1-4de2-ba41-c585b4ded579")
+		)
+		(instances
+			(project "pollen_controller_pcb"
+				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
+					(reference "R6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 129.54 41.91 90)
 		(unit 1)
@@ -6226,6 +6860,82 @@
 			(project "pollen_controller_pcb"
 				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
 					(reference "#PWR015")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Transistor_BJT:PN2222A")
+		(at 125.73 175.26 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "587a60d0-26f1-4df1-81b9-55967a400217")
+		(property "Reference" "Q1"
+			(at 130.81 173.9899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "PN2222A"
+			(at 130.81 176.5299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_THT:TO-92L_HandSolder"
+			(at 130.81 177.165 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/PN2222-D.PDF"
+			(at 125.73 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" "1A Ic, 40V Vce, NPN Transistor, General Purpose Transistor, TO-92"
+			(at 125.73 175.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b67c1d12-6695-4b68-b5f3-1163d8059930")
+		)
+		(pin "2"
+			(uuid "b3206104-ba28-41a6-924b-d6d8112e3130")
+		)
+		(pin "3"
+			(uuid "bb64fb2a-c8e6-4092-9da2-2ec7386012b8")
+		)
+		(instances
+			(project ""
+				(path "/f2cc20a3-db0d-4a80-ba54-6f3bfdfc4764"
+					(reference "Q1")
 					(unit 1)
 				)
 			)
