@@ -8,6 +8,7 @@ from picamera2.encoders import JpegEncoder
 from camera import picam2, denoise_image, encode_jpeg
 from commands import handle_command
 from urllib.parse import urlparse, parse_qs
+from DHT22 import read_dht22
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -56,6 +57,21 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             except Exception as e:
                 self.send_error(500, f"Error executing command: {str(e)}")
 
+        # DHT22 DATA
+        elif self.path == '/get_dht':
+            try:
+                temperature, humidity = read_dht22()
+                if temperature is not None and humidity is not None:
+                    response = f'{{"temperature": {temperature:.1f}, "humidity": {humidity:.1f}}}'
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Content-Length', len(response))
+                    self.end_headers()
+                    self.wfile.write(response.encode())
+                else:
+                    self.send_error(500, "Failed to read DHT22 sensor")
+            except Exception as e:
+                self.send_error(500, f"Error reading DHT22: {str(e)}")
 
         elif self.path == '/stream.mjpg':
             self.send_response(200)
