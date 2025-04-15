@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 
-RELAY_PIN = 2  # GPIO 2
+RELAY_PIN = 22
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RELAY_PIN, GPIO.OUT)

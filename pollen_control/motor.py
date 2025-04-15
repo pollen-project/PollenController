@@ -55,6 +55,6 @@ class Motor:
 
 # Initialize motors
 motors = {
-    'focus': Motor([5, 6, 13, 19], 18, 250),
-    'tape': Motor([16, 20, 21, 26])
+    'focus': Motor([6, 13, 19, 26], 17, 250),
+    'tape': Motor([21, 20, 16, 12])
 }
