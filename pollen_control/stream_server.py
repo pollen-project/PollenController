@@ -58,7 +58,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                 self.send_error(500, f"Error executing command: {str(e)}")
 
         # DHT22 DATA
-        elif self.path == '/get_dht':
+        elif self.path == '/api/get_dht':
             try:
                 temperature, humidity = read_dht22()
                 if temperature is not None and humidity is not None:

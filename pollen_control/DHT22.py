@@ -1,21 +1,23 @@
-import Adafruit_DHT
+import board
+import adafruit_dht
 
-
-sensor = Adafruit_DHT.DHT22
-pin = 25
-
+# Initialize the sensor
+dhtDevice = adafruit_dht.DHT22(board.D25)
 
 def read_dht22():
+    try:
+        temperature_c = dhtDevice.temperature
+        humidity = dhtDevice.humidity
+        return temperature_c, humidity
+    except RuntimeError as error:
+        print(f"DHT22 Read Error: {error}")
+        return None, None
 
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+def main():
+    print(read_dht22())
 
-    if humidity is not None and temperature is not None:
-        print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
-
-        return temperature, humidity
-    else:
-        print('Failed to get reading from DHT22!')
-
+if __name__ == "__main__":
+    main()
 
 # github link
 # https://github.com/FranzTscharf/Python-DHT22-Temperature-Humidity-Sensor-Raspberry-Pi/blob/master/README.md
