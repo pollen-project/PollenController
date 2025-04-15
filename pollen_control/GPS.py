@@ -2,22 +2,20 @@ import serial
 import pynmea2
 import threading
 
-def parseGPS(str):
-    if str.find('GGA') > 0:
-        msg = pynmea2.parse(str)
-        print (f"Timestamp: {msg.timestamp} -- Lat: {msg.lat} {msg.lat_dir} -- Lon: {msg.lon} {msg.lon_dir} -- Altitude: {msg.altitude} {msg.altitude_units}")
 
-serialPort = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
+serialPort = serial.Serial("/dev/ttyAMA3", 9600, timeout=0.5)
 
-def GPS_task():
 
+def gps_task():
     while True:
-        str = serialPort.readline()
-        parseGPS(str)
+        line = serialPort.readline().decode("utf-8")
+        if line.startswith("$GPGGA"):
+            msg = pynmea2.parse(line)
+            print(f"Timestamp: {msg.timestamp} -- Lat: {msg.latitude} -- Lon: {msg.longitude} -- Altitude: {msg.altitude} {msg.altitude_units}")
 
 
-def GPS_start():
-    threading.Thread(target=GPS_task, daemon=True).start()
+def gps_start():
+    threading.Thread(target=gps_task, daemon=True).start()
 
 
 # Github for code
