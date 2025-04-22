@@ -3,19 +3,40 @@ import pynmea2
 import threading
 
 
-serialPort = serial.Serial("/dev/ttyAMA3", 9600, timeout=0.5)
+gps_data = {
+    "timestamp": None,
+    "latitude": None,
+    "longitude": None,
+    "altitude": None,
+    "altitude_units": None,
+    "num_sats": None,
+}
+serial_port = serial.Serial("/dev/ttyAMA3", 9600, timeout=0.5)
 
 
 def gps_task():
+    global gps_data
+
     while True:
-        line = serialPort.readline().decode("utf-8")
+        line = serial_port.readline().decode("utf-8")
         if line.startswith("$GPGGA"):
             msg = pynmea2.parse(line)
-            print(f"Timestamp: {msg.timestamp} -- Lat: {msg.latitude} -- Lon: {msg.longitude} -- Altitude: {msg.altitude} {msg.altitude_units}")
+            gps_data = {
+                "latitude": msg.latitude,
+                "longitude": msg.longitude,
+                "altitude": msg.altitude,
+                "altitude_units": msg.altitude_units,
+                "num_sats": msg.num_sats,
+            }
 
 
 def gps_start():
     threading.Thread(target=gps_task, daemon=True).start()
+
+
+def get_gps_data():
+    global gps_data
+    return gps_data
 
 
 # Github for code

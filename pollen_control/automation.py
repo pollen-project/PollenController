@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from fan import fan_on, fan_off
 from uploading import add_to_upload_queue
 from sensors import get_all_sensor_values
+from GPS import get_gps_data
 
 # Pollen number calculation variables
 IMAGE_SPACING_MM = 1
@@ -40,6 +41,7 @@ def auto_take_pictures_task(testing=False):
         "image": image,
         "temperature": sensors["temperature"],
         "humidity": sensors["humidity"],
+        "gps": get_gps_data(),
     })
     fan_on()
 

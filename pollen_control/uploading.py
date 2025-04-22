@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 import requests
 from datetime import datetime
@@ -40,6 +41,7 @@ def upload_image(data, retries: int = 3, backoff: int = 2) -> None:
         "timestamp": data["timestamp"],
         "temperature": data["temperature"],
         "humidity": data["humidity"],
+        "gps": json.dumps(data["gps"]),
     }
 
     for attempt in range(1, retries + 1):

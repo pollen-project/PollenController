@@ -2,6 +2,7 @@ from time import sleep
 from stream_server import start_stream
 from automation import start_auto_picture_loop
 from uploading import start_upload_queue
+from GPS import gps_task
 import threading
 
 if __name__ == "__main__":
@@ -13,6 +14,8 @@ if __name__ == "__main__":
     
     # Start auto picture loop in a separate thread
     threading.Thread(target=start_auto_picture_loop, daemon=True).start()
+
+    threading.Thread(target=gps_task, daemon=True).start()
     
     # Keep main thread alive
     while True:
