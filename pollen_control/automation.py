@@ -6,6 +6,8 @@ from focus import focus
 from uploading import upload_image
 from concurrent.futures import ThreadPoolExecutor
 from fan import fan_on, fan_off
+from uploading import add_to_upload_queue
+from sensors import get_all_sensor_values
 
 # Pollen number calculation variables
 IMAGE_SPACING_MM = 1
@@ -31,9 +33,15 @@ def auto_take_pictures_task(testing=False):
     fan_off()
     sleep(5.0)
     focus()
-    take_picture()
+    image, timestamp = take_picture()
+    sensors = get_all_sensor_values()
+    add_to_upload_queue({
+        "timestamp": timestamp,
+        "image": image,
+        "temperature": sensors["temperature"],
+        "humidity": sensors["humidity"],
+    })
     fan_on()
-    
 
 
 def start_auto_picture_loop(testing=False):

@@ -2,7 +2,6 @@ import datetime
 import cv2
 import numpy as np
 from picamera2 import Picamera2
-from uploading import add_to_upload_queue
 
 denoise_toggle = False
 color_flag = True
@@ -53,13 +52,14 @@ def take_picture_all():
 
 
 def take_picture():
-    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
     
     noise_status = "" if not denoise_toggle else "dn"
     color_status = "G" if not color_flag else "C"
 
     settings = color_status+noise_status
-    filename = f"photos/image_{now}{settings}.jpg"  # Create filename
+    filename = f"photos/image_{timestamp}{settings}.jpg"  # Create filename
    
     camera_buf = picam2.capture_array()
     image = denoise_image(camera_buf, input_array=True)
@@ -67,9 +67,8 @@ def take_picture():
     
     with open(filename, 'wb') as f:
         f.write(image_jpeg)
-        add_to_upload_queue(image_jpeg, filename)
-    
 
+    return image_jpeg, now
 
 
 def calculate_sharpness():

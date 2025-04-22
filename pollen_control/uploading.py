@@ -21,41 +21,36 @@ def start_upload_queue():
         while True:
             if upload_queue:
                 # Pop the first image and filename from the queue
-                image, filename = upload_queue.pop(0)
-                upload_image(image, filename)
-                
+                data = upload_queue.pop(0)
+                upload_image(data)
 
-            
 
-def add_to_upload_queue(image, filename):
+def add_to_upload_queue(data):
     global queue_status
     queue_status = True
-    upload_queue.append((image, filename))
-    print(f"Image {filename} added to queue.")
+    upload_queue.append(data)
+    print(f"Image added to queue.")
+
     
-    
-def upload_image(image_bytes, filename, retries: int = 3, backoff: int = 2) -> None:
+def upload_image(data, retries: int = 3, backoff: int = 2) -> None:
     """Uploads an image in bytes to the server."""
-    
-    if not image_bytes:
-        print("No image data provided.")
-        return
 
     url = 'https://pollen.botondhorvath.com/api/upload'
-    data = {
-        'filename': filename,
+    form_data = {
+        "timestamp": data["timestamp"],
+        "temperature": data["temperature"],
+        "humidity": data["humidity"],
     }
 
     for attempt in range(1, retries + 1):
         try:
             # Create a file-like object from the bytes
-            files = {'image': ("pollen3", image_bytes, 'image/jpeg')}
-            response = requests.post(url, files=files, data=data, timeout=10)
+            files = {'image': ("pollen3", data["image"], 'image/jpeg')}
+            response = requests.post(url, files=files, data=form_data, timeout=10)
             print(response)
             if response.status_code == 200:
                 print(f"✅ Upload successful on attempt {attempt}")
                 #print("Response:", response.json())
-                print(f"Uploaded image: {filename}")
                 break
             else:
                 print(f"⚠️ Attempt {attempt} failed with status code {response.status_code}")
