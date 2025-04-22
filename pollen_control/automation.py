@@ -15,7 +15,7 @@ TEST_EXPOSURE_TIME_SEC = 300
 # Physical dimensions
 SAMPLE_AREA_MM = 30
 INITIAL_STEPS = 1300
-SAMPLE_AREA_STEPS = 400
+SAMPLE_AREA_STEPS = 800
 
 auto_running = False
 testing = False 
