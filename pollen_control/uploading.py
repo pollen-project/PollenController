@@ -23,6 +23,7 @@ def start_upload_queue():
             if upload_queue:
                 # Pop the first image and filename from the queue
                 data = upload_queue.pop(0)
+                data["detectedPollenCount"] = 0
                 upload_image(data)
 
 
@@ -42,6 +43,7 @@ def upload_image(data, retries: int = 3, backoff: int = 2) -> None:
         "temperature": data["temperature"],
         "humidity": data["humidity"],
         "gps": json.dumps(data["gps"]),
+        "detectedPollenCount": data["detectedPollenCount"],
     }
 
     for attempt in range(1, retries + 1):
