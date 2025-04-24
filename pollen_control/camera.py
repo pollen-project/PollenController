@@ -7,7 +7,7 @@ denoise_toggle = False
 color_flag = True
 
 picam2 = Picamera2()
-picam2.configure(picam2.create_video_configuration(main={"size": (1024, 768)}))  # (640, 480)
+picam2.configure(picam2.create_video_configuration(main={"format": "BGR888", "size": (1024, 768)}))  # (640, 480)
 picam2.set_controls({"Saturation": 1.0})
 
 
@@ -52,6 +52,7 @@ def take_picture_all():
 
 
 def take_picture():
+    picam2.start()
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
     
@@ -60,15 +61,16 @@ def take_picture():
 
     settings = color_status+noise_status
     filename = f"photos/image_{timestamp}{settings}.jpg"  # Create filename
-   
+
     camera_buf = picam2.capture_array()
-    image = denoise_image(camera_buf, input_array=True)
+    #image = denoise_image(camera_buf, input_array=True)
+    image = camera_buf
     image_jpeg = encode_jpeg(image)
-    
+
     with open(filename, 'wb') as f:
         f.write(image_jpeg)
 
-    return image_jpeg, now
+    return image, image_jpeg, now
 
 
 def calculate_sharpness():

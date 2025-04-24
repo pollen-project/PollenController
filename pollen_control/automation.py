@@ -34,13 +34,14 @@ def auto_take_pictures_task(testing=False):
     fan_off()
     sleep(5.0)
     focus()
-    image, timestamp = take_picture()
-    sensors = get_all_sensor_values()
+    image, image_jpeg, timestamp = take_picture()
+    #sensors = get_all_sensor_values()
     add_to_upload_queue({
         "timestamp": timestamp,
-        "image": image,
-        "temperature": sensors["temperature"],
-        "humidity": sensors["humidity"],
+        "image_raw": image,
+        "image": image_jpeg,
+        "temperature": 0, # sensors["temperature"],
+        "humidity": 0, # sensors["humidity"],
         "gps": get_gps_data(),
     })
     fan_on()

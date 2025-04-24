@@ -1,13 +1,15 @@
 import os
 import json
 from pathlib import Path
+from xml.etree.ElementTree import indent
+
 import requests
 from datetime import datetime
 import time
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import time
-
+from prediction import run_predict
 
 upload_queue = []
 queue_status = False
@@ -23,7 +25,8 @@ def start_upload_queue():
             if upload_queue:
                 # Pop the first image and filename from the queue
                 data = upload_queue.pop(0)
-                data["detectedPollenCount"] = 0
+                data["detections"] = run_predict(data["image_raw"])
+                data["detectedPollenCount"] = len(data["detections"])
                 upload_image(data)
 
 
@@ -43,8 +46,11 @@ def upload_image(data, retries: int = 3, backoff: int = 2) -> None:
         "temperature": data["temperature"],
         "humidity": data["humidity"],
         "gps": json.dumps(data["gps"]),
+        "detections": data["detections"],
         "detectedPollenCount": data["detectedPollenCount"],
     }
+
+    print(json.dumps(form_data, indent=2, default=str))
 
     for attempt in range(1, retries + 1):
         try:
