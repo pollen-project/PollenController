@@ -17,6 +17,8 @@ serial_port = serial.Serial("/dev/ttyAMA3", 9600, timeout=0.5)
 def gps_task():
     global gps_data
 
+    _ = serial_port.readline()
+
     while True:
         line = serial_port.readline().decode("utf-8")
         if line.startswith("$GPGGA"):
