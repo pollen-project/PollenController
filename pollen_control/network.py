@@ -10,10 +10,10 @@ nbiot_cmds = [
 ]
 
 MQTT_cmds = [
-    {"AT+QMTOPEN=0,\"137.135.83.217\",1883", "+QMTOPEN: 0,0"},
-    {"AT+QMTCONN=0,\"pollen-bc660\"", "+QMTCONN: 0,0"},
-    {"AT+QMTPUB=0,0,0,0,\"/pollen\"", "+QMTPUB: 0,0"},
-    {"AT+QMTDISC=0", "+QMTDISC: 0,0"},
+    ("AT+QMTOPEN=0,\"137.135.83.217\",1883", "+QMTOPEN: 0,0"),
+    ("AT+QMTCONN=0,\"pollen-bc660\"", "+QMTCONN: 0,0"),
+    ("AT+QMTPUB=0,0,0,0,\"/pollen\"", "+QMTPUB: 0,0"),
+    ("AT+QMTDISC=0", "+QMTDISC: 0,0"),
 ]
 
 class MQTT:
@@ -29,7 +29,6 @@ class MQTT:
         self.rx_buffer = bytearray()
         self.RX_BUF_SIZE = 256
         self.on_publish_done = None
-        self.mqtt_cmds = []  # Should be filled with objects like {"cmd": "...", "ok_response": "..."}
         self.callback_func = None
         self.callback_on_resp = ""
 
@@ -53,13 +52,13 @@ class MQTT:
         self.sent_cmd_index = self.cmd_index
 
     def send_next_mqtt_cmd(self):
-        if self.mqtt_cmd_index >= len(self.mqtt_cmds):
+        if self.mqtt_cmd_index >= len(MQTT_cmds):
             if self.on_publish_done:
                 self.on_publish_done(True)
             return
-        cmd = self.mqtt_cmds[self.mqtt_cmd_index]
-        print(f"Sending command: {cmd['cmd']}")
-        self.uart_puts(cmd['cmd'] + "\r\n")
+        cmd = MQTT_cmds[self.mqtt_cmd_index]
+        print(f"Sending command: {cmd[0]}")
+        self.uart_puts(cmd[0] + "\r\n")
         self.uart_tx_wait_blocking()
         self.mqtt_sent_cmd_index = self.mqtt_cmd_index
 
@@ -95,7 +94,7 @@ class MQTT:
             self.cmd_index += 1
             self.send_next_cmd()
 
-        elif self.mqtt_sent_cmd_index > -1 and line.startswith(self.mqtt_cmds[self.mqtt_sent_cmd_index]['ok_response']):
+        elif self.mqtt_sent_cmd_index > -1 and line.startswith(MQTT_cmds[self.mqtt_sent_cmd_index][1]):
             self.mqtt_cmd_index += 1
             self.send_next_mqtt_cmd()
 

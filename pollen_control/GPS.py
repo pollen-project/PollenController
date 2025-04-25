@@ -28,7 +28,7 @@ def gps_task():
                 "longitude": msg.longitude,
                 "altitude": msg.altitude,
                 "altitude_units": msg.altitude_units,
-                "num_sats": msg.num_sats,
+                "num_sats": int(msg.num_sats),
             }
 
 

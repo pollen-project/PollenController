@@ -1,13 +1,11 @@
-import threading
 from time import sleep
 from camera import take_picture, camera_settings
 from motor import motors
 from focus import focus
-from uploading import upload_image
 from concurrent.futures import ThreadPoolExecutor
 from fan import fan_on, fan_off
 from uploading import add_to_upload_queue
-from sensors import get_all_sensor_values
+from DHT22 import read_dht22
 from GPS import get_gps_data
 
 # Pollen number calculation variables
@@ -21,30 +19,39 @@ INITIAL_STEPS = 1300
 SAMPLE_AREA_STEPS = 800
 
 auto_running = False
-testing = False 
+testing = False
+focus_home_counter = 0
 
 def auto_take_pictures_task(testing=False):
+    global focus_home_counter
+
     sample_area_image_count = SAMPLE_AREA_MM / IMAGE_SPACING_MM
     tape_steps = SAMPLE_AREA_STEPS / sample_area_image_count
 
     # Calculate step progress globally or persistently if needed
     print("Taking picture with tape step:", tape_steps)
 
+    if focus_home_counter >= 15:
+        motors["focus"].home()
+        focus_home_counter = 0
+
     motors["tape"].move(tape_steps * -1)
     fan_off()
     sleep(5.0)
     focus()
     image, image_jpeg, timestamp = take_picture()
-    #sensors = get_all_sensor_values()
+    temperature, humidity = read_dht22()
     add_to_upload_queue({
         "timestamp": timestamp,
         "image_raw": image,
         "image": image_jpeg,
-        "temperature": 0, # sensors["temperature"],
-        "humidity": 0, # sensors["humidity"],
+        "temperature": temperature,
+        "humidity": humidity,
         "gps": get_gps_data(),
     })
     fan_on()
+
+    focus_home_counter += 1
 
 
 def start_auto_picture_loop(testing=False):
@@ -66,7 +73,6 @@ def start_auto_picture_loop(testing=False):
     with ThreadPoolExecutor(max_workers=1) as executor:
         print("E: thread opened")
         while auto_running:
-           
             executor.submit(auto_take_pictures_task, testing)
             sleep(image_freq_sec)
 

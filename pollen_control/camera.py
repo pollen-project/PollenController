@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import cv2
 import numpy as np
 from picamera2 import Picamera2
@@ -53,8 +53,8 @@ def take_picture_all():
 
 def take_picture():
     picam2.start()
-    now = datetime.datetime.now()
-    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
+    now = datetime.now(timezone.utc)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format timestamp
     
     noise_status = "" if not denoise_toggle else "dn"
     color_status = "G" if not color_flag else "C"

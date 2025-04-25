@@ -41,16 +41,18 @@ def upload_image(data, retries: int = 3, backoff: int = 2) -> None:
     """Uploads an image in bytes to the server."""
 
     url = 'https://pollen.botondhorvath.com/api/upload'
-    form_data = {
+    metadata = {
         "timestamp": data["timestamp"],
         "temperature": data["temperature"],
         "humidity": data["humidity"],
-        "gps": json.dumps(data["gps"]),
+        "gps": data["gps"],
         "detections": data["detections"],
         "detectedPollenCount": data["detectedPollenCount"],
     }
 
-    print(json.dumps(form_data, indent=2, default=str))
+    form_data = {
+        "data": json.dumps(metadata, default=str)
+    }
 
     for attempt in range(1, retries + 1):
         try:
