@@ -35,6 +35,8 @@ def auto_take_pictures_task(testing=False):
         motors["focus"].home()
         focus_home_counter = 0
 
+    camera_settings("grey")
+    camera_settings("denoise off")
     motors["tape"].move(tape_steps * -1)
     fan_off()
     sleep(5.0)
@@ -65,7 +67,7 @@ def start_auto_picture_loop(testing=False):
     fan_on()
 
     # Replace with your actual camera + motor logic
-    camera_settings("color")
+    camera_settings("grey")
     camera_settings("denoise off")
     print("Returning Home")
     motors["focus"].home()
