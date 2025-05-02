@@ -109,27 +109,32 @@ app.get('/api/devices', async (req, res) => {
 })
 
 app.get('/api/history', async (req, res) => {
-    const deviceName = req.query.device
-    const filters = {}
+  const deviceName = req.query.device
+  const filters = {}
 
-    if (deviceName) {
-        filters.name = deviceName
-    }
+  if (deviceName) {
+    filters.name = deviceName
+  }
 
-    if ("from" in req.query && "until" in req.query) {
-        res.json(await queryAveragedData(deviceName, req.query.from, req.query.until))
-        return
+  if ("from" in req.query && "until" in req.query) {
+    res.json(await queryAveragedData(deviceName, req.query.from, req.query.until))
+    return
+  }
+  else if ("from" in req.query) {
+    filters.timestamp = {
+      $gte: new Date(req.query.from),
     }
-    else if ("from" in req.query) {
-        filters.timestamp = {
-            $gte: new Date(req.query.from),
-        }
-    }
+  }
 
-    res.json(await history.find(filters)
-        .sort({timestamp: -1})
-        .limit(100)
-        .toArray())
+  res.json(await history.find(filters)
+    .sort({timestamp: -1})
+    .limit(100)
+    .toArray())
+})
+
+app.get('/api/detections', async (req, res) => {
+  const { device, mode, count } = req.query
+  res.json(await queryDetectionsData(device, mode, count))
 })
 
 app.post('/api/upload', upload.single('image'), async (req, res) => {
@@ -225,71 +230,142 @@ app.listen(port, () => {
 
 
 async function queryAveragedData(name, start, end, maxPoints = 100) {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const startMillis = startDate.getTime();
-    const intervalMillis = Math.ceil((endDate.getTime() - startMillis) / maxPoints);
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const startMillis = startDate.getTime();
+  const intervalMillis = Math.ceil((endDate.getTime() - startMillis) / maxPoints);
 
-    const match = {
-        timestamp: { $gte: startDate, $lte: endDate }
-    }
+  const match = {
+    timestamp: { $gte: startDate, $lte: endDate }
+  }
 
-    if (name) {
-        match.name = name
-    }
+  if (name) {
+    match.name = name
+  }
 
-    const pipeline = [
-      {
-        $match: match
-      },
-      {
-        $addFields: {
-          timestampMillis: { $toLong: "$timestamp" }
-        }
-      },
-      {
-        $addFields: {
-          bucketIndex: {
-            $floor: {
-              $divide: [
-                { $subtract: ["$timestampMillis", startMillis] },
-                intervalMillis
-              ]
-            }
+  const pipeline = [
+    {
+      $match: match
+    },
+    {
+      $addFields: {
+        timestampMillis: { $toLong: "$timestamp" }
+      }
+    },
+    {
+      $addFields: {
+        bucketIndex: {
+          $floor: {
+            $divide: [
+              { $subtract: ["$timestampMillis", startMillis] },
+              intervalMillis
+            ]
           }
         }
-      },
-      {
-        $group: {
-          _id: "$bucketIndex",
-          timestamp: { $first: "$timestampMillis" },
-          image: { $first: "$image" },
-          gps: { $first: "$gps" },
-          detections: { $first: "$detections" },
-          temperature: { $avg: "$temperature" },
-          humidity: { $avg: "$humidity" },
-          detectedPollenCount: { $sum: "$detectedPollenCount" },
-          estimatedPollenCount: { $avg: "$estimatedPollenCount" }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          timestamp: { $toDate: "$timestamp" },
-          image: 1,
-          gps: 1,
-          detections: 1,
-          temperature: 1,
-          humidity: 1,
-          detectedPollenCount: 1,
-          estimatedPollenCount: 1
-        }
-      },
-      {
-        $sort: { timestamp: 1 }
       }
-    ];
+    },
+    {
+      $group: {
+        _id: "$bucketIndex",
+        timestamp: { $first: "$timestampMillis" },
+        image: { $first: "$image" },
+        gps: { $first: "$gps" },
+        detections: { $first: "$detections" },
+        temperature: { $avg: "$temperature" },
+        humidity: { $avg: "$humidity" },
+        detectedPollenCount: { $sum: "$detectedPollenCount" },
+        estimatedPollenCount: { $avg: "$estimatedPollenCount" }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        timestamp: { $toDate: "$timestamp" },
+        image: 1,
+        gps: 1,
+        detections: 1,
+        temperature: 1,
+        humidity: 1,
+        detectedPollenCount: 1,
+        estimatedPollenCount: 1
+      }
+    },
+    {
+      $sort: { timestamp: 1 }
+    }
+  ];
 
-    const result = await history.aggregate(pipeline).toArray();
-    return result;
+  const result = await history.aggregate(pipeline).toArray();
+  return result;
+}
+
+async function queryDetectionsData(name, mode = 'hourly', maxPoints = 7) {
+  const startDate = new Date()
+  let intervalMillis
+
+  if (mode === 'daily') {
+    startDate.setHours(0, 0, 0, 0)
+    startDate.setDate(startDate.getDate() - (maxPoints - 1))
+    intervalMillis = 24 * 3600 * 1000;
+  }
+  else {
+    startDate.setMinutes(0, 0, 0)
+    startDate.setHours(startDate.getHours() - (maxPoints - 1))
+    intervalMillis = 3600 * 1000;
+  }
+
+  const startMillis = startDate.getTime();
+
+  const match = {
+    timestamp: { $gte: startDate }
+  }
+
+  if (name) {
+    match.name = name
+  }
+
+  const pipeline = [
+    {
+      $match: match
+    },
+    {
+      $addFields: {
+        timestampMillis: { $toLong: "$timestamp" }
+      }
+    },
+    {
+      $addFields: {
+        bucketIndex: {
+          $floor: {
+            $divide: [
+              { $subtract: ["$timestampMillis", startMillis] },
+              intervalMillis
+            ]
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$bucketIndex",
+        timestamp: { $first: "$timestampMillis" },
+        detectedPollenCount: { $sum: "$detectedPollenCount" },
+        estimatedPollenCount: { $sum: "$estimatedPollenCount" }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        timestamp: { $toDate: "$timestamp" },
+        detectedPollenCount: 1,
+        estimatedPollenCount: 1
+      }
+    },
+    {
+      $sort: { timestamp: 1 }
+    }
+  ];
+
+  const result = await history.aggregate(pipeline).toArray();
+  return result;
 }
