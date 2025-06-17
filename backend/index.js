@@ -133,8 +133,9 @@ app.get('/api/history', async (req, res) => {
 })
 
 app.get('/api/detections', async (req, res) => {
-  const { device, mode, count } = req.query
-  res.json(await queryDetectionsData(device, mode, count))
+  const { device, mode, count, from } = req.query
+  const timestamp = from ? new Date(from) : new Date()
+  res.json(await queryDetectionsData(device, mode, count, timestamp))
 })
 
 app.post('/api/upload', upload.single('image'), async (req, res) => {
@@ -299,25 +300,31 @@ async function queryAveragedData(name, start, end, maxPoints = 100) {
   return result;
 }
 
-async function queryDetectionsData(name, mode = 'hourly', maxPoints = 7) {
-  const startDate = new Date()
+async function queryDetectionsData(name, mode = 'hourly', maxPoints = 7, startDate = new Date()) {
+  const endDate = new Date(startDate)
   let intervalMillis
 
   if (mode === 'daily') {
     startDate.setHours(0, 0, 0, 0)
     startDate.setDate(startDate.getDate() - (maxPoints - 1))
+    endDate.setHours(0, 0, 0, 0)
+    endDate.setDate(endDate.getDate() + 1)
     intervalMillis = 24 * 3600 * 1000;
   }
   else {
     startDate.setMinutes(0, 0, 0)
     startDate.setHours(startDate.getHours() - (maxPoints - 1))
+    endDate.setMinutes(0, 0, 0)
     intervalMillis = 3600 * 1000;
   }
 
   const startMillis = startDate.getTime();
 
   const match = {
-    timestamp: { $gte: startDate }
+    timestamp: {
+      $gte: startDate,
+      $lte: endDate
+    }
   }
 
   if (name) {
